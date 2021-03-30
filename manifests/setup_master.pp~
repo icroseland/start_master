@@ -1,0 +1,51 @@
+# @install puppetmaster and configure
+# we have no useful hiera yet!
+class start_master::setup_master(
+$packages = undef
+$master_of_master = puppetmaster.local
+$host_type = puppet_master
+$version  = 'present'
+$manage_user = true
+$user = 'puppet'
+$group = 'puppet'
+$ip = $::ipaddress
+$port = 8140
+$listen = true
+$listen_to = undef
+$pluginsync = true
+$splay = false
+$splaylimit = undef
+$runinterval = undef
+$runmode = undef
+$report = true
+$cron_cmd = undef
+$systemd_cmd = undef
+$agent_noop = false
+$show_diff = true
+$module_repository = undef
+$hiera_config = '$confdir/hiera.yaml'
+$usecacheonfailure = true
+$ca_server = $::ca_server
+$ca_port = 8140
+$ca_crl_enable = true
+$prerun_command = undef
+$postrun_command = undef
+$server_compile_mode = undef
+$dns_alt_names = []
+$use_srv_records = true
+$pluginsource = 'puppet:///plugins'
+$pluginfactsource = 'puppet:///pluginfacts'
+$classfile = '$vardir/classes.txt'
+$syslogfacility = undef
+$environment = production
+$server = true
+){
+# setup facts to keep things sane.
+file { ['/etc/facter', '/etc/facter/facts.d']:
+  ensure => directory
+  }
+file {'/etc/facter/facts.d/puppetmaster.txt':
+  ensure  => file,
+  content => "role=puppetmaster\npuppetenv=production\n"
+  }
+}
