@@ -27,7 +27,6 @@ $pluginsource = 'puppet:///plugins'
 $pluginfactsource = 'puppet:///pluginfacts'
 $classfile = '$vardir/classes.txt'
 $environment = production
-$server = true
 ){
 # setup facts to keep things sane.
 file { ['/etc/facter', '/etc/facter/facts.d']:
@@ -38,6 +37,10 @@ file {'/etc/facter/facts.d/puppetmaster.txt':
   content => "role=puppetmaster\npuppetenv=production\n"
   }
 class { '::puppet':
+  server                => true,
+  server_foreman        => false,
+  server_reports        => 'store',
+  server_external_nodes => '',
   version                 => $version,
   user                    => $user,
   group                   => $group,
@@ -57,20 +60,6 @@ class { '::puppet':
   pluginfactsource        => $pluginfactsource,
   classfile               => $classfile,
   environment             => $environment,
-  server                  => $server,
-  server_ca               => $server_ca,
-  server_ca_crl_sync      => $server_ca_crl_sync,
-  server_reports          => $server_reports,
-  server_external_nodes   => $server_external_nodes,
-  server_enc_api          => $server_enc_api,
-  server_report_api       => $server_report_api,
-  server_request_timeout  => $server_request_timeout,
-  server_certname         => $server_certname,
-  server_strict_variables => $server_strict_variables,
-  server_http             => $server_http,
-  server_http_port        => $server_http_port,
-  puppetmaster            => $mom_name,
-  server_foreman          => $server_foreman,
   autosign_entries        => $autosign_entries
   }
 }
