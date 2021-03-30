@@ -17,7 +17,10 @@ echo 'setting up base directory structure'
 
 echo 'grabbing the bootstrap module'
 mkdir /tmp/modules/start_master
-curl -L 'https://github.com/icroseland/start_master/archive/refs/heads/main.zip' | tar -xz -C /tmp/modules/start_master --strip-components=1
+wget -O /tmp/start_master.zip 'https://github.com/icroseland/start_master/archive/refs/heads/main.zip'
+unzip /tmp/start_master.zip -d /tmp/modules
+mv /tmp/modules/start_master-main /tmp/modules/start_master
+rm -f /tmp/start_master.zip 
 echo 'loading modules from puppetlabs'
 mkdir /tmp/modules/stdlib
 curl -L 'https://forge.puppet.com/v3/files/puppetlabs-stdlib-5.1.0.tar.gz' | tar -xz -C /tmp/modules/stdlib --strip-components=1
