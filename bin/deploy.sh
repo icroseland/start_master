@@ -15,9 +15,6 @@ yum install puppet-agent -y
 echo 'setting up base directory structure'
 /opt/puppetlabs/bin/puppet apply -e  "file { '/tmp/modules': ensure => directory }"
 
-echo 'loading modules from github'
-git clone $MASTER_REPO
-
 mkdir /tmp/modules/start_master
 curl -L 'https://github.com/icroseland/start_master/archive/refs/heads/main.zip' | tar -xz -C /tmp/modules/start_master --strip-components
 echo 'loading modules from puppetlabs'
