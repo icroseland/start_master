@@ -24,7 +24,7 @@ echo 'loading modules from puppetlabs'
 mkdir /tmp/modules/stdlib
 curl -L 'https://forge.puppet.com/v3/files/puppetlabs-stdlib-5.1.0.tar.gz' | tar -xz -C /tmp/modules/stdlib --strip-components=1
 mkdir /tmp/modules/puppet
-curl -L 'https://forge.puppet.com/v3/files/theforeman-puppet-12.0.1.tar.gz' | tar -xz -C /tmp/modules/puppet --strip-components=1
+curl -L 'https://forge.puppet.com/v3/files/theforeman-puppet-14.2.1.tar.gz' | tar -xz -C /tmp/modules/puppet --strip-components=1
 mkdir /tmp/modules/apache
 curl -L 'https://forge.puppet.com/v3/files/puppetlabs-apache-3.4.0.tar.gz' | tar -xz -C /tmp/modules/apache --strip-components=1
 mkdir /tmp/modules/concat
