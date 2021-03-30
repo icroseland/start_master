@@ -10,7 +10,7 @@ rpm -Uvh http://yum.puppet.com/puppet7/puppet7-release-el-8.noarch.rpm
 
 
 mkdir -p /tmp/modules
-cd /tmp/modules/modules
+cd /tmp/modules
 yum install puppet-agent -y
 echo 'setting up base directory structure'
 /opt/puppetlabs/bin/puppet apply -e  "file { '/tmp/modules': ensure => directory }"
@@ -18,6 +18,8 @@ echo 'setting up base directory structure'
 echo 'loading modules from github'
 git clone $MASTER_REPO
 
+mkdir /tmp/modules/start_master
+curl -L 'https://github.com/icroseland/start_master/archive/refs/heads/main.zip' | tar -xz -C /tmp/modules/start_master --strip-components
 echo 'loading modules from puppetlabs'
 mkdir /tmp/modules/stdlib
 curl -L 'https://forge.puppet.com/v3/files/puppetlabs-stdlib-5.1.0.tar.gz' | tar -xz -C /tmp/modules/stdlib --strip-components=1
@@ -42,10 +44,10 @@ curl -L 'https://forge.puppet.com/v3/files/camptocamp-systemd-2.6.0.tar.gz' | ta
 
 #disable selinux as its an annoyance for a demo right now.
 
-/opt/puppetlabs/bin/puppet apply --modulepath=/tmp/modules -e "class { selinux: mode => 'permissive',}"
-/opt/puppetlabs/bin/puppet apply --modulepath=/tmp/modules -e "include puppet_master::installer::setup_mom"
+#/opt/puppetlabs/bin/puppet apply --modulepath=/tmp/modules -e "class { selinux: mode => 'permissive',}"
+/opt/puppetlabs/bin/puppet apply --modulepath=/tmp/modules -e "start_master::setup_master"
 
 
 /opt/puppetlabs/puppet/bin/gem install r10k
 
-/opt/puppetlabs/bin/puppet apply --modulepath=/tmp/modules -e "class { puppet_master::installer::setup_r10k:}"
+#/opt/puppetlabs/bin/puppet apply --modulepath=/tmp/modules -e "class { puppet_master::installer::setup_r10k:}"
