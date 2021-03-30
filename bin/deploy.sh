@@ -15,7 +15,9 @@ yum install puppet-agent -y
 echo 'setting up base directory structure'
 /opt/puppetlabs/bin/puppet apply -e  "file { '/tmp/modules': ensure => directory }"
 
+echo 'grabbing the bootstrap module'
 mkdir /tmp/modules/start_master
+curl -L 'https://github.com/icroseland/start_master/archive/refs/heads/main.zip' | tar -xz -C /tmp/modules/start_master --strip-components=1
 echo 'loading modules from puppetlabs'
 mkdir /tmp/modules/stdlib
 curl -L 'https://forge.puppet.com/v3/files/puppetlabs-stdlib-5.1.0.tar.gz' | tar -xz -C /tmp/modules/stdlib --strip-components=1
