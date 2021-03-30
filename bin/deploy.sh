@@ -16,7 +16,6 @@ echo 'setting up base directory structure'
 /opt/puppetlabs/bin/puppet apply -e  "file { '/tmp/modules': ensure => directory }"
 
 echo 'grabbing the bootstrap module'
-mkdir /tmp/modules/start_master
 wget -O /tmp/start_master.zip 'https://github.com/icroseland/start_master/archive/refs/heads/main.zip'
 unzip /tmp/start_master.zip -d /tmp/modules
 mv /tmp/modules/start_master-main /tmp/modules/start_master
