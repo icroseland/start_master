@@ -26,7 +26,8 @@ $r10k_invalid_branches = 'correct',
 $r10k_basedir = '/etc/puppetlabs/code/environments/'
 ){
 # setup facts to keep things sane.
-$r10k_configured = { $r10k_name  => {
+$r10k_configured = { sources => {
+                      $r10k_name  => {
                         remote => $r10k_remote,
                         basedir => $r10k_basedir,
                         invalid_branches => $r10k_invalid_branches
