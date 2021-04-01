@@ -33,6 +33,7 @@ $r10k_configured = { sources => {
                         invalid_branches => $r10k_invalid_branches
                         }
                     }
+} 
 
 File {
   owner => 'puppet',
