@@ -104,7 +104,7 @@ file {'/etc/puppetlabs/www/client.sh':
   content => epp('start_master/etc/puppetlabs/www/client.sh.epp', {
     'server' => $::fqdn
   }),
-  require => File('/etc/puppetlabs/www')
+  require => File['/etc/puppetlabs/www']
 }
 nginx::resource::server { $::fqdn:
   www_root => '/etc/puppetlabs/www',
