@@ -39,11 +39,12 @@ File {
 }
 file { ['/etc/facter', '/etc/facter/facts.d']:
   ensure => directory
-  }->
+  }
 file {'/etc/facter/facts.d/puppetmaster.txt':
   ensure  => file,
   content => "role=puppetmaster\npuppetenv=production\n"
-  }->
+  require => File['/etc/facter', '/etc/facter/facts.d']
+  }
 class { '::puppet':
   server                  => true,
   agent                   => true,
