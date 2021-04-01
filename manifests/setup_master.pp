@@ -93,6 +93,20 @@ package {'git':
 exec { 'deploy environments':
   command => '/opt/puppetlabs/puppet/bin/r10k deploy environment -p',
   require => Exec['install_r10k_gem'],
-  }  
-
+  }
+file {'/etc/puppetlabs/www':
+  ensure => directory,
+  mode   => '0555',
+  }
+file {'/etc/puppetlabs/www/client.sh':
+  ensure  => file,
+  mode    => '0555',
+  content => epp('start_master/etc/puppetlabs/www/client.sh.epp', {
+    'server' => $::fqdn
+  }),
+  require => File('/etc/puppetlabs/www')
+}
+nginx::resource::server { $::fqdn:
+  www_root => '/etc/puppetlabs/www',
+  }
 }

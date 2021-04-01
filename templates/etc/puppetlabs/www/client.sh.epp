@@ -1,0 +1,46 @@
+#!/bin/bash
+# setup puppet on a client host
+# 
+
+
+ROLE='undef'
+COLLECTION='undef'
+APPLICATION='undef'
+ENVIRONMENT='undef'
+
+IFS=' '
+read -ra ARGS <<< "$@"
+IFS='='
+for i in "${ARGS[@]}"; do
+    read -ra PAIR <<< "$i"
+    case ${PAIR[0]} in
+        role)
+            ROLE=${PAIR[1]}
+            ;;
+        collection)
+            COLLECTION=${PAIR[1]}
+            ;;
+        application)
+            APPLICATION=${PAIR[1]}
+            ;;
+        environment)
+            ENVIRONMENT=${PAIR[1]}
+            ;;
+        esac
+done
+
+rpm -Uvh http://yum.puppet.com/puppet7/puppet7-release-el-8.noarch.rpm
+yum update -y
+yum install puppet-agent -y
+
+mkdir -p /etc/facter/facts.d
+#generate initial facts.. 
+
+echo "role=$ROLE" >> /etc/facter/facts.d/client.txt
+echo "collection=$COLLECTION" >> /etc/facter/facts.d/client.txt
+echo "application=$APPLICATION" >> /etc/facter/facts.d/client.txt
+echo "environment=$ENVIRONMENT" >> /etc/facter/facts.d/client.txt
+echo "puppet_type=client"
+
+#first run of puppet to get cert and setup client and host
+/opt/puppetlabs/bin/puppet agent -t --server <%= $server %>
