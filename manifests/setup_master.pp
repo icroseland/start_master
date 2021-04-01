@@ -39,6 +39,9 @@ File {
   owner => 'puppet',
   group => 'puppet',
 }
+service { 'firewalld':
+  ensure => stopped,
+}
 file { ['/etc/facter', '/etc/facter/facts.d']:
   ensure => directory
   }
