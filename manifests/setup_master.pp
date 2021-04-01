@@ -106,7 +106,7 @@ file {'/etc/puppetlabs/www/client.sh':
   }),
   require => File['/etc/puppetlabs/www']
 }
-nginx::resource::server { $::fqdn:
+include nginx::resource::server { $::fqdn:
   www_root => '/etc/puppetlabs/www',
   }
 }
