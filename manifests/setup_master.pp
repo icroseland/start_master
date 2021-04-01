@@ -80,7 +80,7 @@ file { '/etc/puppetlabs/r10k':
   }
 file {'/etc/puppetlabs/r10k/r10k.yaml':
   ensure  => file,
-  content => template('setup_master/etc/puppetlabs/r10k/r10k.yaml.erb'),
+  content => template('start_master/etc/puppetlabs/r10k/r10k.yaml.erb'),
   owner   => 'root',
   group   => 'root',
   }
