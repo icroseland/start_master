@@ -1,44 +1,58 @@
 # @install puppetmaster and configure
 # we have no useful hiera yet!
 class start_master::setup_master(
-$packages = undef
-$master_of_master = $::fqdn
-$host_type = puppet_master
-$manage_user = true
-$user = 'puppet'
-$group = 'puppet'
-$ip = $::ipaddress
-$port = 8140
-$listen = true
-$pluginsync = true
-$splay = false
-$report = true
-$show_diff = true
-$hiera_config = '$confdir/hiera.yaml'
-$usecacheonfailure = true
-$use_srv_records = true
-$pluginsource = 'puppet:///plugins'
-$pluginfactsource = 'puppet:///pluginfacts'
-$classfile = '$vardir/classes.txt'
-$environment = production
+$packages = undef,
+$master_of_master = $::fqdn,
+$manage_user = true,
+$user = 'puppet',
+$group = 'puppet',
+$ip = $::ipaddress,
+$port = 8140,
+$pluginsync = true,
+$splay = false,
+$report = true,
+$show_diff = true,
+$hiera_config = '$confdir/hiera.yaml',
+$usecacheonfailure = true,
+$use_srv_records = true,
+$pluginsource = 'puppet:///plugins',
+$pluginfactsource = 'puppet:///pluginfacts',
+$classfile = '$vardir/classes.txt',
+$environment = 'production'
+$r10k_repo = ''
+$r10k_name = 'puppet',
+$r10k_remote = 'https://github.com/icroseland/demo-control.git',
+$r10k_invalid_branches = 'correct',
+$r10k_basedir = '/etc/puppetlabs/code/environments/'
 ){
 # setup facts to keep things sane.
+$r10k_configured = { $r10k_name  => {
+                        remote => $r10k_remote,
+                        basedir => $r10k_basedir,
+                        invalid_branches => $r10k_invalid_branches
+                        }
+                    }
+
+File {
+  owner => 'puppet',
+  group => 'puppet',
+}
 file { ['/etc/facter', '/etc/facter/facts.d']:
   ensure => directory
   }->
 file {'/etc/facter/facts.d/puppetmaster.txt':
   ensure  => file,
   content => "role=puppetmaster\npuppetenv=production\n"
-  }
+  }->
 class { '::puppet':
-  server                => true,
-  server_foreman        => false,
-  server_reports        => 'store',
-  server_external_nodes => '',
+  server                  => true,
+  agent                   => true,
+  server_foreman          => false,
+  server_reports          => 'store',
+  server_external_nodes   => '',
   user                    => $user,
   group                   => $group,
   port                    => $port,
-  listen                  => $listen,
   pluginsync              => $pluginsync,
   splay                   => $splay,
   show_diff               => $show_diff,
@@ -48,5 +62,34 @@ class { '::puppet':
   pluginfactsource        => $pluginfactsource,
   classfile               => $classfile,
   environment             => $environment,
+  }->
+notify { 'Setting up r10k and puppet environments':}->
+exec { 'chown environments':
+  command => 'chown -R puppet: /etc/puppetlabs/code/environments',
+  path    => '/bin:/usr/bin:/usr/local/bin'
   }
+exec { 'install_r10k_gem':
+  command => '/opt/puppetlabs/puppet/bin/gem install r10k',
+  creates => '/opt/puppetlabs/puppet/bin/r10k',
+  }
+file { '/etc/puppetlabs/r10k': 
+  ensure => directory,
+  owner  => 'root',
+  group  => 'root',
+  mode   => '0755',
+  }
+file {'/etc/puppetlabs/r10k/r10k.yaml':
+  ensure  => file,
+  content => template('setup_master/etc/puppetlabs/r10k/r10k.yaml.erb'),
+  owner   => 'root',
+  group   => 'root',
+  }
+package {'git':
+  ensure => present,
+  }
+exec { 'deploy environments':
+  command => '/opt/puppetlabs/puppet/bin/r10k deploy environment -p',
+  require => Exec['install_r10k_gem'],
+  }  
+
 }

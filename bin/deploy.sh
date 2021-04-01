@@ -41,11 +41,24 @@ mkdir /tmp/modules/selinux
 curl -L 'https://forge.puppet.com/v3/files/puppet-selinux-1.6.1.tar.gz' | tar -xz -C /tmp/modules/selinux --strip-components=1
 mkdir /tmp/modules/systemd
 curl -L 'https://forge.puppet.com/v3/files/camptocamp-systemd-2.6.0.tar.gz' | tar -xz -C /tmp/modules/systemd --strip-components=1
+mkdir /tmp/modules/r10k
+curl -L 'https://forge.puppet.com/v3/files/puppet-r10k-9.0.0.tar.gz' | tar -xz -C /tmp/modules/r10k --strip-components=1
+mkdir /tmp/modules/git
+curl -L 'https://forge.puppet.com/v3/files/puppetlabs-git-0.5.0.tar.gz' | tar -xz -C /tmp/modules/git --strip-components=1
+mkdir /tmp/modules/inifile
+curl -L 'https://forge.puppet.com/v3/files/puppetlabs-inifile-5.0.1.tar.gz' | tar -xz -C /tmp/modules/inifile --strip-components=1
+mkdir /tmp/modules/translate
+curl -L 'https://forge.puppet.com/v3/files/puppetlabs-translate-2.2.0.tar.gz' | tar -xz -C /tmp/modules/translate --strip-components=1
+mkdir /tmp/modules/ruby
+curl -L 'https://forge.puppet.com/v3/files/puppetlabs-ruby-1.0.1.tar.gz' | tar -xz -C /tmp/modules/ruby --strip-components=1
+mkdir /tmp/modules/vcsrepo
+curl -L 'https://forge.puppet.com/v3/files/puppetlabs-vcsrepo-4.0.1.tar.gz' | tar -xz -C /tmp/modules/vcsrepo --strip-components=1
+
 
 #disable selinux as its an annoyance for a demo right now.
 
 #/opt/puppetlabs/bin/puppet apply --modulepath=/tmp/modules -e "class { selinux: mode => 'permissive',}"
-/opt/puppetlabs/bin/puppet apply --modulepath=/tmp/modules -e "start_master::setup_master"
+/opt/puppetlabs/bin/puppet apply --modulepath=/tmp/modules -e "include start_master::setup_master"
 
 
 /opt/puppetlabs/puppet/bin/gem install r10k

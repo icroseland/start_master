@@ -1,0 +1,7 @@
+## this file is managed by puppet
+<% if @r10k_configured -%>
+<%= @r10k_configured.to_yaml %>
+<% end -%>
+<% if @r10k_postrun -%>
+postrun: [<%= @r10k_postrun %>]
+<% end -%>
