@@ -117,7 +117,7 @@ nginx::resource::location {"${::fqdn}_root":
   ensure              => present,
   server              => "${::fqdn}",
   www_root            => '/etc/puppetlabs/www',
-  location            => "~ .*nginx\/.*\.php$",
+  location            => '~ .*nginx\/.*\.php$',
   index_files         => ['index.php', 'index.html'],
   proxy               => undef,
   fastcgi             => 'unix:/var/run/php-fpm/nginx-fpm.sock',
@@ -140,7 +140,7 @@ class {'php':
   fpm_pools     => {},
   }
 php::fpm::pool{ $::fqdn:
-  user         +> 'nginx',
+  user         => 'nginx',
   group        => 'nginx',
   listen_owner => 'http',
   listen_group => 'http',
