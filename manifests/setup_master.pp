@@ -130,13 +130,13 @@ nginx::resource::location {"${::fqdn}_root":
 }
 class {'php':
   ensure        => 'present',
-  manages_repos => true,
+  manage_repos => true,
   fpm           => true,
   dev           => false,
   composer      => false,
   pear          => false,
   phpunit       => false,
-  fpm_tools     => {},
+  fpm_pools     => {},
   }
 
 }
