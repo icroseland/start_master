@@ -115,7 +115,6 @@ nginx::resource::server { $::fqdn:
   }
 nginx::resource::location {"${::hostname}_root":
   ensure              => present,
-  server              => "${::fqdn} ${::hostname}",
   www_root            => '/etc/puppetlabs/www',
   location            => '~ \.php$',
   index_files         => ['index.php', 'index.html'],
