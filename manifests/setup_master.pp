@@ -117,10 +117,11 @@ nginx::resource::location {"${::fqdn}_root":
   ensure              => present,
   server              => "${::fqdn}",
   www_root            => '/etc/puppetlabs/www',
-  location            => '~ \.php$',
+  location            => "~ .*nginx\/.*\.php$",
   index_files         => ['index.php', 'index.html'],
   proxy               => undef,
-  fastcgi             => "127.0.0.1:9000",
+  fastcgi             => 'unix:/var/run/php-fpm/nginx-fpm.sock',
+  include             => ['fastcgi.conf'],
   fastcgi_script      => undef,
   location_cfg_append => {
     fastcgi_connect_timeout => '3m',
@@ -130,7 +131,7 @@ nginx::resource::location {"${::fqdn}_root":
 }
 class {'php':
   ensure        => 'present',
-  manage_repos => true,
+  manage_repos  => true,
   fpm           => true,
   dev           => false,
   composer      => false,
@@ -138,5 +139,13 @@ class {'php':
   phpunit       => false,
   fpm_pools     => {},
   }
+php::fpm::pool{ $::fqdn:
+  user         +> 'nginx',
+  group        => 'nginx',
+  listen_owner => 'http',
+  listen_group => 'http',
+  listen_mode  => '0660',
+  listen       => '/var/run/php-fpm/nginx-fpm.sock',
+}
 
 }
