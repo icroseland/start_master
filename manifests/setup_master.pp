@@ -113,4 +113,19 @@ include nginx
 nginx::resource::server { $::fqdn:
   www_root => '/etc/puppetlabs/www',
   }
+nginx::resource::location {"${::hostname}_root":
+  ensure              => present,
+  server              => "${::fqdn} ${::hostname}",
+  www_root            => '/etc/puppetlabs/www',
+  location            => '~ \.php$',
+  index_files         => ['index.php', 'index.html'],
+  proxy               => undef,
+  fastcgi             => "127.0.0.1:9000",
+  fastcgi_script      => undef,
+  location_cfg_append => {
+    fastcgi_connect_timeout => '3m',
+    fastcgi_read_timeout    => '3m',
+    fastcgi_send_timeout    => '3m'
+  }
+}
 }
