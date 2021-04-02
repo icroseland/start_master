@@ -113,8 +113,9 @@ include nginx
 nginx::resource::server { $::fqdn:
   www_root => '/etc/puppetlabs/www',
   }
-nginx::resource::location {"${::hostname}_root":
+nginx::resource::location {"${::fqdn}_root":
   ensure              => present,
+  server              => "${::fqdn}",
   www_root            => '/etc/puppetlabs/www',
   location            => '~ \.php$',
   index_files         => ['index.php', 'index.html'],
