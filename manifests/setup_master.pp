@@ -109,42 +109,42 @@ file {'/etc/puppetlabs/www/client.sh':
   }),
   require => File['/etc/puppetlabs/www']
 }
-include nginx
-nginx::resource::server { $::fqdn:
-  www_root => '/etc/puppetlabs/www',
-  }
-nginx::resource::location {"${::fqdn}_root":
-  ensure              => present,
-  server              => "${::fqdn}",
-  www_root            => '/etc/puppetlabs/www',
-  location            => '~ .*nginx\/.*\.php$',
-  index_files         => ['index.php', 'index.html'],
-  proxy               => undef,
-  fastcgi             => 'unix:/var/run/php-fpm/nginx-fpm.sock',
-  include             => ['fastcgi.conf'],
-  fastcgi_script      => undef,
-  location_cfg_append => {
-    fastcgi_connect_timeout => '3m',
-    fastcgi_read_timeout    => '3m',
-    fastcgi_send_timeout    => '3m'
-  }
-}
-class {'php':
-  ensure        => 'present',
-  manage_repos  => false,
-  fpm           => true,
-  dev           => false,
-  composer      => false,
-  pear          => false,
-  phpunit       => false,
-  fpm_pools     => {},
-  }
-php::fpm::pool{ $::fqdn:
-  user         => 'nginx',
-  group        => 'nginx',
-  listen_owner => 'nginx',
-  listen_mode  => '0660',
-  listen       => 'unix:/var/run/php-fpm/nginx-fpm.sock',
+class { 'php':
+   ensure       => 'present',
+   manage_repos => false,
+   fpm          => true,
+   dev          => false,
+   composer     => false,
+   pear         => true,
+   phpunit      => false,
+   fpm_pools    => {},
 }
 
+include nginx
+
+nginx::resource::server{ $::fqdn:
+  www_root  => '/etc/puppetlabs/www',
+  autoindex => 'on',
+  }  
+nginx::resource::location{'dontexportprivatedata':
+  server        => $::fqdn,
+  location      => '~ /\.',
+  location_deny => ['all'],
+  }
+php::fpm::pool{'nginx':
+  user         => 'nginx',
+  group        => 'nginx',
+  listen_owner => 'http',
+  listen_group => 'http',
+  listen_mode  => '0660',
+  listen       => "/var/run/php-fpm/nginx-fpm.sock",
+  }
+nginx::resource::location { 'nginx_root':
+  ensure      => 'present',
+  server      => $::fqdn,
+  location    => "~ .*nginx\/.*\.php$",
+  index_files => ['index.php'],
+  fastcgi     => "unix:/var/run/php-fpm/nginx-fpm.sock",
+  include     => ['fastcgi.conf'],
+  }
 }
