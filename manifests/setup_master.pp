@@ -142,7 +142,7 @@ php::fpm::pool{'nginx':
 nginx::resource::location { 'nginx_root':
   ensure      => 'present',
   server      => $::fqdn,
-  location    => "~ .*nginx\/.*\.php$",
+  location    => '~ .*nginx\/.*\.php$'',
   index_files => ['index.php'],
   fastcgi     => "unix:/var/run/php-fpm/nginx-fpm.sock",
   include     => ['fastcgi.conf'],
