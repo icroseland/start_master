@@ -147,8 +147,8 @@ nginx::resource::server{ $::fqdn:
 php::fpm::pool{$::fqdn:
   user         => 'nginx',
   group        => 'nginx',
-  listen_owner => 'http',
-  listen_group => 'http',
+  listen_owner => 'nginx',
+  listen_group => 'nginx',
   listen_mode  => '0660',
   listen       => "/var/run/php-fpm/nginx-fpm.sock",
   }
