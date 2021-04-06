@@ -147,14 +147,14 @@ php::fpm::pool{$::fqdn:
   listen_owner => 'http',
   listen_group => 'http',
   listen_mode  => '0660',
-  listen       => "/var/run/nginx-fpm.sock",
+  listen       => "/var/run/php-fpm/nginx-fpm.sock",
   }
 nginx::resource::location { "${::fqdn}_root":
   ensure      => 'present',
   server      => $::fqdn,
   location    => '~ .*nginx\/.*\.php$',
   index_files => ['index.php'],
-  fastcgi     => "unix:/var/run/nginx-fpm.sock",
+  fastcgi     => "unix:/var/run/php-fpm/nginx-fpm.sock",
   include     => ['fastcgi.conf'],
   }
 
