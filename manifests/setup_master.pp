@@ -138,11 +138,11 @@ nginx::resource::server{ $::fqdn:
   www_root  => '/etc/puppetlabs/www',
   autoindex => 'on',
   }  
-nginx::resource::location{'dontexportprivatedata':
-  server        => $::fqdn,
-  location      => '~ /\.',
-  location_deny => ['all'],
-  }
+#nginx::resource::location{'dontexportprivatedata':
+#  server        => $::fqdn,
+#  location      => '~ /\.',
+#  location_deny => ['all'],
+#  }
 php::fpm::pool{$::fqdn:
   user         => 'nginx',
   group        => 'nginx',
@@ -161,4 +161,3 @@ nginx::resource::location { "${::fqdn}_root":
   }
 
 
-}
