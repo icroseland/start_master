@@ -141,7 +141,7 @@ nginx::resource::location{'dontexportprivatedata':
   location      => '~ /\.',
   location_deny => ['all'],
   }
-php::fpm::pool{'nginx':
+php::fpm::pool{$::fqdn:
   user         => 'nginx',
   group        => 'nginx',
   listen_owner => 'http',
@@ -149,7 +149,7 @@ php::fpm::pool{'nginx':
   listen_mode  => '0660',
   listen       => "/var/run/php-fpm/nginx-fpm.sock",
   }
-nginx::resource::location { 'nginx_root':
+nginx::resource::location { "${::fqdn}_root":
   ensure      => 'present',
   server      => $::fqdn,
   location    => '~ .*nginx\/.*\.php$',
