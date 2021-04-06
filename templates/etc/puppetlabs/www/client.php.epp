@@ -71,7 +71,7 @@ echo \"role=$ROLE\" >> /etc/facter/facts.d/client.txt\n
 echo \"collection=\$COLLECTION\" >> /etc/facter/facts.d/client.txt\n
 echo \"application=\$APPLICATION\" >> /etc/facter/facts.d/client.txt\n
 echo \"environment=\$ENVIRONMENT\" >> /etc/facter/facts.d/client.txt\n
-echo \"puppet_type=client\"\n
+echo \"puppet_type=client\" >> /etc/facter/facts.d/client.txt\n
 \n
 #first run of puppet to get cert and setup client and host\n
 /opt/puppetlabs/bin/puppet agent -t --server testmaster1.local\n
