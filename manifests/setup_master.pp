@@ -50,26 +50,27 @@ file {'/etc/facter/facts.d/puppetmaster.txt':
   content => "role=puppetmaster\npuppetenv=production\n",
   require => File['/etc/facter', '/etc/facter/facts.d'],
   }
-class { '::puppet':
-  server                  => true,
-  server_foreman          => false,
-  server_reports          => 'store',
-  server_external_nodes   => '',
-  user                    => $user,
-  group                   => $group,
-  port                    => $port,
-  pluginsync              => $pluginsync,
-  splay                   => $splay,
-  show_diff               => $show_diff,
-  usecacheonfailure       => $usecacheonfailure,
-  use_srv_records         => $use_srv_records,
-  pluginsource            => $pluginsource,
-  pluginfactsource        => $pluginfactsource,
-  classfile               => $classfile,
-  agent                   => true,
-  puppetmaster            => $::fqdn,
-  environment             => $environment,
-  }->
+#class { '::puppet':
+#  server                  => true,
+#  server_foreman          => false,
+#  server_reports          => 'store',
+#  server_external_nodes   => '',
+#  user                    => $user,
+#  group                   => $group,
+#  port                    => $port,
+#  pluginsync              => $pluginsync,
+#  splay                   => $splay,
+#  show_diff               => $show_diff,
+#  usecacheonfailure       => $usecacheonfailure,
+#  use_srv_records         => $use_srv_records,
+#  pluginsource            => $pluginsource,
+#  pluginfactsource        => $pluginfactsource,
+#  classfile               => $classfile,
+#  agent                   => true,
+#  puppetmaster            => $::fqdn,
+#  environment             => $environment,
+#  }->
+include puppet
 notify { 'Setting up r10k and puppet environments':}->
 exec { 'chown environments':
   command => 'chown -R puppet: /etc/puppetlabs/code/environments',
