@@ -66,11 +66,9 @@ class { '::puppet':
   pluginsource            => $pluginsource,
   pluginfactsource        => $pluginfactsource,
   classfile               => $classfile,
-  }->
-class { 'puppet::agent':
-  agent        => true,
-  puppetmaster => $::fqdn,
-  environment  => $environment,
+  agent                   => true,
+  puppetmaster            => $::fqdn,
+  environment             => $environment,
   }->
 notify { 'Setting up r10k and puppet environments':}->
 exec { 'chown environments':
