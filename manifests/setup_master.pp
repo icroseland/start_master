@@ -68,6 +68,7 @@ class { '::puppet':
   pluginfactsource        => $pluginfactsource,
   classfile               => $classfile,
   environment             => $environment,
+  puppetmaster            => $::fqdn,
   }->
 notify { 'Setting up r10k and puppet environments':}->
 exec { 'chown environments':

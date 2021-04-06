@@ -12,79 +12,52 @@ if ($_GET) {
     $environment = $argv[4];
 }
 
-$n=10;
-function getRandomString($n){
-  $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  $randomstring = '';
+$server_name = '<%= $facts[fqdn] %>';
+echo("#!/bin/bash\n");
+echo("# setup puppet on a client host\n");
+echo("#\n");
+echo("\n");
+echo("\n");
+echo("ROLE='$role'\n");
+echo("COLLECTION='$collection'\n");
+echo("APPLICATION='$application'\n");
+echo("ENVIRONMENT='$environment'\n");
+echo("\n");
+echo("IFS=' '\n");
+echo("read -ra ARGS <<< \"\$@\"\n");
+echo("IFS='='\n");
+echo("for i in \"\${ARGS[@]}\"; do\n");
+echo("    read -ra PAIR <<< \"\$i\"\n");
+echo("    case \${PAIR[0]} in\n");
+echo("        role)\n");
+echo("            ROLE=\${PAIR[1]}\n");
+echo("            ;;\n");
+echo("        collection)\n");
+echo("            COLLECTION=\${PAIR[1]}\n");
+echo("            ;;\n");
+echo("        application)\n");
+echo("            APPLICATION=\${PAIR[1]}\n");
+echo("            ;;\n");
+echo("        environment)\n");
+echo("            ENVIRONMENT=\${PAIR[1]}\n");
+echo("            ;;\n");
+echo("        esac\n");
+echo("done\n");
 
-  for ($i = 0; $i < $n; $i++) {
-    $index = rand(0, strlen($characters) -1);
-    $randomString .= $characters[$index];
-  }
-
-  return $randomString;
-}
-
-$file_name = getRandomString($n);
-$server_name = <%= $facts[fqnd] %>
-$file = "/tmp/$file_name.txt";
-$txt = fopen($file, "w") or die("Unable to open file!");
-fwrite($txt, "#!/bin/bash\n
-# setup puppet on a client host\n
-#\n
-\n
-\n
-ROLE='$role'\n
-COLLECTION='$collection'\n
-APPLICATION='$application'\n
-ENVIRONMENT='$environment'\n
-\n
-IFS=' '\n
-read -ra ARGS <<< \"\$@\"\n
-IFS='='\n
-for i in \"\${ARGS[@]}\"; do\n
-    read -ra PAIR <<< \"\$i\"\n
-    case \${PAIR[0]} in\n
-        role)\n
-            ROLE=\${PAIR[1]}\n
-            ;;\n
-        collection)\n
-            COLLECTION=\${PAIR[1]}\n
-            ;;\n
-        application)\n
-            APPLICATION=\${PAIR[1]}\n
-            ;;\n
-        environment)\n
-            ENVIRONMENT=\${PAIR[1]}\n
-            ;;\n
-        esac\n
-done\n
-
-rpm -Uvh http://yum.puppet.com/puppet7/puppet7-release-el-8.noarch.rpm\n
-yum update -y\n
-yum install puppet-agent -y\n
-\n
-mkdir -p /etc/facter/facts.d\n
-#generate initial facts..\n
-\n
-echo \"role=$ROLE\" >> /etc/facter/facts.d/client.txt\n
-echo \"collection=\$COLLECTION\" >> /etc/facter/facts.d/client.txt\n
-echo \"application=\$APPLICATION\" >> /etc/facter/facts.d/client.txt\n
-echo \"environment=\$ENVIRONMENT\" >> /etc/facter/facts.d/client.txt\n
-echo \"puppet_type=client\" >> /etc/facter/facts.d/client.txt\n
-\n
-#first run of puppet to get cert and setup client and host\n
-/opt/puppetlabs/bin/puppet agent -t --server testmaster1.local\n
-");
-fclose($txt);
-
-header('Content-Description: File Transfer');
-header('Content-Disposition: attachment; filename='.basename($file));
-header('Expires: 0');
-header('Cache-Control: must-revalidate');
-header('Pragma: public');
-header('Content-Length: ' . filesize($file));
-header("Content-Type: text/plain");
-readfile($file);
+echo("rpm -Uvh http://yum.puppet.com/puppet7/puppet7-release-el-8.noarch.rpm\n");
+echo("yum update -y\n");
+echo("yum install puppet-agent -y\n");
+echo("\n");
+echo("mkdir -p /etc/facter/facts.d\n");
+echo("#generate initial facts..\n");
+echo("\n");
+echo("echo \"role=$ROLE\" >> /etc/facter/facts.d/client.txt\n");
+echo("echo \"collection=\$COLLECTION\" >> /etc/facter/facts.d/client.txt\n");
+echo("echo \"application=\$APPLICATION\" >> /etc/facter/facts.d/client.txt\n");
+echo("echo \"environment=\$ENVIRONMENT\" >> /etc/facter/facts.d/client.txt\n");
+echo("echo \"puppet_type=client\" >> /etc/facter/facts.d/client.txt\n");
+echo("\n");
+echo("#first run of puppet to get cert and setup client and host\n");
+echo("/opt/puppetlabs/bin/puppet agent -t --server testmaster1.local\n");
 
 ?>
