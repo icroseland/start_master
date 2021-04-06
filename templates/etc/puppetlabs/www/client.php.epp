@@ -40,22 +40,22 @@ APPLICATION='$application'\n
 ENVIRONMENT='$environment'\n
 \n
 IFS=' '\n
-read -ra ARGS <<< "$@"\n
+read -ra ARGS <<< \"\$@\"\n
 IFS='='\n
-for i in "${ARGS[@]}"; do\n
-    read -ra PAIR <<< "$i"\n
-    case ${PAIR[0]} in\n
+for i in \"\${ARGS[@]}\"; do\n
+    read -ra PAIR <<< \"\$i\"\n
+    case \${PAIR[0]} in\n
         role)\n
-            ROLE=${PAIR[1]}\n
+            ROLE=\${PAIR[1]}\n
             ;;\n
         collection)\n
-            COLLECTION=${PAIR[1]}\n
+            COLLECTION=\${PAIR[1]}\n
             ;;\n
         application)\n
-            APPLICATION=${PAIR[1]}\n
+            APPLICATION=\${PAIR[1]}\n
             ;;\n
         environment)\n
-            ENVIRONMENT=${PAIR[1]}\n
+            ENVIRONMENT=\${PAIR[1]}\n
             ;;\n
         esac\n
 done\n
