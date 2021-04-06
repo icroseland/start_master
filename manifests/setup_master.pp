@@ -149,7 +149,7 @@ php::fpm::pool{$::fqdn:
   group        => 'nginx',
   listen_owner => 'nginx',
   listen_group => 'nginx',
-  listen_mode  => '0660',
+  #listen_mode  => '0660',
   listen       => "/var/run/php-fpm/nginx-fpm.sock",
   }
 nginx::resource::location { "${::fqdn}_root":
