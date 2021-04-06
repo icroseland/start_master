@@ -125,6 +125,7 @@ user { 'http':
   comment => 'make php work',
   shell   => '/sbin/nologin',
   gid     => 'http',
+}
 
 include nginx
 
