@@ -120,6 +120,9 @@ class { 'php':
    fpm_pools    => {},
 }
 
+group { 'http':
+  ensure => present
+}
 user { 'http':
   ensure  => present,
   comment => 'make php work',
@@ -154,5 +157,6 @@ nginx::resource::location { 'nginx_root':
   fastcgi     => "unix:/var/run/php-fpm/nginx-fpm.sock",
   include     => ['fastcgi.conf'],
   }
+
 
 }
