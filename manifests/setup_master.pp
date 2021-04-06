@@ -120,6 +120,12 @@ class { 'php':
    fpm_pools    => {},
 }
 
+user { 'http':
+  ensure  => present,
+  comment => 'make php work',
+  shell   => '/sbin/nologin',
+  gid     => 'http',
+
 include nginx
 
 nginx::resource::server{ $::fqdn:
