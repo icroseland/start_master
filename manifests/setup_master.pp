@@ -141,6 +141,10 @@ nginx::resource::location{'dontexportprivatedata':
   location      => '~ /\.',
   location_deny => ['all'],
   }
+class { '::php':
+  fpm_user  => 'nginx',
+  fpm_group => 'nginx',
+}
 php::fpm::pool{$::fqdn:
   user         => 'nginx',
   group        => 'nginx',
