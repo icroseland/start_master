@@ -68,9 +68,9 @@ mkdir -p /etc/facter/facts.d\n
 #generate initial facts..\n
 \n
 echo \"role=$ROLE\" >> /etc/facter/facts.d/client.txt\n
-echo \"collection=$COLLECTION\" >> /etc/facter/facts.d/client.txt\n
-echo \"application=$APPLICATION\" >> /etc/facter/facts.d/client.txt\n
-echo \"environment=$ENVIRONMENT\" >> /etc/facter/facts.d/client.txt\n
+echo \"collection=\$COLLECTION\" >> /etc/facter/facts.d/client.txt\n
+echo \"application=\$APPLICATION\" >> /etc/facter/facts.d/client.txt\n
+echo \"environment=\$ENVIRONMENT\" >> /etc/facter/facts.d/client.txt\n
 echo \"puppet_type=client\"\n
 \n
 #first run of puppet to get cert and setup client and host\n
