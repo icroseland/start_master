@@ -1,0 +1,90 @@
+<?php
+
+if ($_GET) {
+    $role = $_GET['role'];
+    $collection = $_GET['collection'];
+    $application = $_GET['application'];
+    $environment = $_GET['environment'];
+} else {
+    $role = $argv[1];
+    $collection = $argv[2];
+    $application = $argv[3];
+    $environment = $argv[4];
+}
+
+$n=10;
+function getRandomString($n){
+  $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  $randomstring = '';
+
+  for ($i = 0; $i < $n; $i++) {
+    $index = rand(0, strlen($characters) -1);
+    $randomString .= $characters[$index];
+  }
+
+  return $randomString;
+}
+
+$file_name = getRandomString($n);
+$server_name = <%= $facts[fqnd] %>
+$file = "/tmp/$file_name.txt";
+$txt = fopen($file, "w") or die("Unable to open file!");
+fwrite($txt, "#!/bin/bash\n
+# setup puppet on a client host\n
+#\n
+\n
+\n
+ROLE='$role'\n
+COLLECTION='$collection'\n
+APPLICATION='$application'\n
+ENVIRONMENT='$environment'\n
+\n
+IFS=' '\n
+read -ra ARGS <<< "$@"\n
+IFS='='\n
+for i in "${ARGS[@]}"; do\n
+    read -ra PAIR <<< "$i"\n
+    case ${PAIR[0]} in\n
+        role)\n
+            ROLE=${PAIR[1]}\n
+            ;;\n
+        collection)\n
+            COLLECTION=${PAIR[1]}\n
+            ;;\n
+        application)\n
+            APPLICATION=${PAIR[1]}\n
+            ;;\n
+        environment)\n
+            ENVIRONMENT=${PAIR[1]}\n
+            ;;\n
+        esac\n
+done\n
+
+rpm -Uvh http://yum.puppet.com/puppet7/puppet7-release-el-8.noarch.rpm\n
+yum update -y\n
+yum install puppet-agent -y\n
+\n
+mkdir -p /etc/facter/facts.d\n
+#generate initial facts..\n
+\n
+echo \"role=$ROLE\" >> /etc/facter/facts.d/client.txt\n
+echo \"collection=$COLLECTION\" >> /etc/facter/facts.d/client.txt\n
+echo \"application=$APPLICATION\" >> /etc/facter/facts.d/client.txt\n
+echo \"environment=$ENVIRONMENT\" >> /etc/facter/facts.d/client.txt\n
+echo \"puppet_type=client\"\n
+\n
+#first run of puppet to get cert and setup client and host\n
+/opt/puppetlabs/bin/puppet agent -t --server testmaster1.local\n
+");
+fclose($txt);
+
+header('Content-Description: File Transfer');
+header('Content-Disposition: attachment; filename='.basename($file));
+header('Expires: 0');
+header('Cache-Control: must-revalidate');
+header('Pragma: public');
+header('Content-Length: ' . filesize($file));
+header("Content-Type: text/plain");
+readfile($file);
+
+?>

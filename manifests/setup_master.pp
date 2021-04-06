@@ -109,6 +109,12 @@ file {'/etc/puppetlabs/www/client.sh':
   }),
   require => File['/etc/puppetlabs/www']
 }
+file {'/etc/puppetlabs/www/client.php':
+  ensure  => file,
+  mode    => '0555',
+  content => epp('start_master/etc/puppetlabs/www/client.php.epp'),
+  require => File['/etc/puppetlabs/www'],
+}
 class { 'php':
    ensure       => 'present',
    manage_repos => false,
