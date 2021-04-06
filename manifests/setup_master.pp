@@ -135,6 +135,7 @@ user { 'http':
 include nginx
 
 nginx::resource::server{ $::fqdn:
+  ensure    => present,
   www_root  => '/etc/puppetlabs/www',
   autoindex => 'on',
   }  
@@ -152,12 +153,14 @@ php::fpm::pool{$::fqdn:
   listen       => "/var/run/php-fpm/nginx-fpm.sock",
   }
 nginx::resource::location { "${::fqdn}_root":
-  ensure      => 'present',
-  server      => $::fqdn,
-  location    => '~ .*nginx\/.*\.php$',
-  index_files => ['index.php'],
-  fastcgi     => "unix:/var/run/php-fpm/nginx-fpm.sock",
-  include     => ['fastcgi.conf'],
+  ensure         => 'present',
+  server         => $::fqdn,
+  www_root       => '/etc/puppetlabs/www',
+  location       => '~ \.php$',
+  index_files    => ['index.php'],
+  fastcgi        => "unix:/var/run/php-fpm/nginx-fpm.sock",
+  fastcgi_script => undef,
+  include        => ['fastcgi.conf'],
   }
 
 }
