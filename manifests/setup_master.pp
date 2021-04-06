@@ -160,4 +160,4 @@ nginx::resource::location { "${::fqdn}_root":
   include     => ['fastcgi.conf'],
   }
 
-
+}
