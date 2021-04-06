@@ -52,7 +52,6 @@ file {'/etc/facter/facts.d/puppetmaster.txt':
   }
 class { '::puppet':
   server                  => true,
-  agent                   => true,
   server_foreman          => false,
   server_reports          => 'store',
   server_external_nodes   => '',
@@ -67,9 +66,13 @@ class { '::puppet':
   pluginsource            => $pluginsource,
   pluginfactsource        => $pluginfactsource,
   classfile               => $classfile,
-  environment             => $environment,
-  puppetmaster            => $::fqdn,
+  
   }->
+class { 'puppet::agent':
+  agent        => true,
+  puppetmaster => $::fqdn,
+  environment  => $environment,
+  }
 notify { 'Setting up r10k and puppet environments':}->
 exec { 'chown environments':
   command => 'chown -R puppet: /etc/puppetlabs/code/environments',
