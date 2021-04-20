@@ -1,25 +1,10 @@
 # @install puppetmaster and configure
 # we have no useful hiera yet!
 class start_master::setup_master(
-$packages = undef,
-$master_of_master = $::fqdn,
-$manage_user = true,
 $user = 'puppet',
 $group = 'puppet',
 $ip = $::ipaddress,
-$port = 8140,
-$pluginsync = true,
-$splay = false,
-$report = true,
-$show_diff = true,
-$hiera_config = '$confdir/hiera.yaml',
-$usecacheonfailure = true,
-$use_srv_records = true,
-$pluginsource = 'puppet:///plugins',
-$pluginfactsource = 'puppet:///pluginfacts',
-$classfile = '$vardir/classes.txt',
 $environment = 'production',
-$r10k_repo = '',
 $r10k_name = 'puppet',
 $r10k_remote = 'https://github.com/icroseland/demo-control.git',
 $r10k_invalid_branches = 'correct',
@@ -36,8 +21,8 @@ $r10k_configured = { sources => {
 } 
 
 File {
-  owner => 'puppet',
-  group => 'puppet',
+  owner => $user,
+  group => $group,
 }
 service { 'firewalld':
   ensure => stopped,
@@ -117,7 +102,6 @@ class { 'php':
    fpm_group    => 'nginx',
    fpm_pools    => {},
 }
-
 group { 'http':
   ensure => present
 }
@@ -135,11 +119,6 @@ nginx::resource::server{ $::fqdn:
   www_root  => '/etc/puppetlabs/www',
   autoindex => 'on',
   }  
-#nginx::resource::location{'dontexportprivatedata':
-#  server        => $::fqdn,
-#  location      => '~ /\.',
-#  location_deny => ['all'],
-#  }
 php::fpm::pool{$::fqdn:
   user         => 'nginx',
   group        => 'nginx',
