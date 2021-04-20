@@ -54,20 +54,8 @@ class { '::puppet':
   server                  => true,
   agent                   => true,
   server_foreman          => false,
-  server_reports          => 'store',
-  server_external_nodes   => '',
-  user                    => $user,
-  group                   => $group,
-  port                    => $port,
-  pluginsync              => $pluginsync,
-  splay                   => $splay,
-  show_diff               => $show_diff,
-  usecacheonfailure       => $usecacheonfailure,
-  use_srv_records         => $use_srv_records,
-  pluginsource            => $pluginsource,
-  pluginfactsource        => $pluginfactsource,
-  classfile               => $classfile,
   environment             => $environment,
+  autosign                => true,
   }->
 notify { 'Setting up r10k and puppet environments':}->
 exec { 'chown environments':
