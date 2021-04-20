@@ -13,6 +13,7 @@ rpm -Uvh http://yum.puppet.com/puppet7/puppet7-release-el-8.noarch.rpm
 mkdir -p /tmp/modules
 cd /tmp/modules
 yum install puppet-agent -y
+yum install puppetserver
 echo 'setting up base directory structure'
 /opt/puppetlabs/bin/puppet apply -e  "file { '/tmp/modules': ensure => directory }"
 
