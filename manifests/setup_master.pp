@@ -46,6 +46,8 @@ class { '::puppet':
   server                  => true,
   agent                   => true,
   server_foreman          => false,
+  server_reports          => 'store',
+  server_external_nodes   => '',
   environment             => $environment,
   autosign                => true,
   }->
