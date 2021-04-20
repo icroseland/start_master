@@ -3,10 +3,11 @@
 # no git ssh required for this to work against the public repos.
 
 
-yum update -y
+##yum update -y
 yum install wget -y
 yum install git -y
 rpm -Uvh http://yum.puppet.com/puppet7/puppet7-release-el-8.noarch.rpm
+
 
 
 mkdir -p /tmp/modules
@@ -60,6 +61,9 @@ curl -L 'https://forge.puppet.com/v3/files/puppet-php-7.1.0.tar.gz' | tar -xz -C
 
 #disable selinux as its an annoyance for a demo right now.
 /opt/puppetlabs/puppet/bin/gem install r10k
+/opt/puppetlabs/puppet/bin/gem install lookup_http
+/opt/puppetlabs/bin/puppetserver gem install lookup_http
+
 #/opt/puppetlabs/bin/puppet apply --modulepath=/tmp/modules -e "class { selinux: mode => 'permissive',}"
 /opt/puppetlabs/bin/puppet apply --modulepath=/tmp/modules -e "include start_master::setup_master"
 
