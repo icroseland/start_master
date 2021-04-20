@@ -42,19 +42,20 @@ File {
 service { 'firewalld':
   ensure => stopped,
 }
-file { ['/etc/facter', '/etc/facter/facts.d']:
-  ensure => directory
-  }->
-file {'/etc/facter/facts.d/puppetmaster.txt':
-  ensure  => file,
-  content => "role=puppetmaster\npuppetenv=production\n",
-  }->
 class { '::puppet':
   server                  => true,
   agent                   => true,
   server_foreman          => false,
   environment             => $environment,
   autosign                => true,
+  }->
+file { ['/etc/facter', '/etc/facter/facts.d']:
+  ensure => directory
+  }->
+file {'/etc/facter/facts.d/puppetmaster.txt':
+  ensure  => file,
+  content => "role=puppetmaster\npuppetenv=production\n",
+  require => File['/etc/facter', '/etc/facter/facts.d'],
   }->
 notify { 'Setting up r10k and puppet environments':}->
 exec { 'chown environments':
