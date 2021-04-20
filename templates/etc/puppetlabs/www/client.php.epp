@@ -51,7 +51,7 @@ echo("\n");
 echo("mkdir -p /etc/facter/facts.d\n");
 echo("#generate initial facts..\n");
 echo("\n");
-echo("echo \"role=$ROLE\" >> /etc/facter/facts.d/client.txt\n");
+echo("echo \"role=\$ROLE\" >> /etc/facter/facts.d/client.txt\n");
 echo("echo \"collection=\$COLLECTION\" >> /etc/facter/facts.d/client.txt\n");
 echo("echo \"application=\$APPLICATION\" >> /etc/facter/facts.d/client.txt\n");
 echo("echo \"environment=\$ENVIRONMENT\" >> /etc/facter/facts.d/client.txt\n");
