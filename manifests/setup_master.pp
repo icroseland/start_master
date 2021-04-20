@@ -76,14 +76,6 @@ file {'/etc/puppetlabs/www':
   ensure => directory,
   mode   => '0555',
   }
-file {'/etc/puppetlabs/www/client.sh':
-  ensure  => file,
-  mode    => '0555',
-  content => epp('start_master/etc/puppetlabs/www/client.sh.epp', {
-    'server' => $::fqdn
-  }),
-  require => File['/etc/puppetlabs/www']
-}
 file {'/etc/puppetlabs/www/client.php':
   ensure  => file,
   mode    => '0555',
