@@ -117,34 +117,50 @@ class { 'php':
    composer     => false,
    pear         => true,
    phpunit      => false,
+   fpm_user     => 'nginx',
+   fpm_group    => 'nginx',
    fpm_pools    => {},
+}
+
+group { 'http':
+  ensure => present
+}
+user { 'http':
+  ensure  => present,
+  comment => 'make php work',
+  shell   => '/sbin/nologin',
+  gid     => 'http',
 }
 
 include nginx
 
 nginx::resource::server{ $::fqdn:
+  ensure    => present,
   www_root  => '/etc/puppetlabs/www',
   autoindex => 'on',
   }  
-nginx::resource::location{'dontexportprivatedata':
-  server        => $::fqdn,
-  location      => '~ /\.',
-  location_deny => ['all'],
-  }
-php::fpm::pool{'nginx':
+#nginx::resource::location{'dontexportprivatedata':
+#  server        => $::fqdn,
+#  location      => '~ /\.',
+#  location_deny => ['all'],
+#  }
+php::fpm::pool{$::fqdn:
   user         => 'nginx',
   group        => 'nginx',
-  listen_owner => 'http',
-  listen_group => 'http',
-  listen_mode  => '0660',
+  listen_owner => 'nginx',
+  listen_group => 'nginx',
+  listen_mode  => '0666',
   listen       => "/var/run/php-fpm/nginx-fpm.sock",
   }
-nginx::resource::location { 'nginx_root':
-  ensure      => 'present',
-  server      => $::fqdn,
-  location    => "~ .*nginx\/.*\.php$",
-  index_files => ['index.php'],
-  fastcgi     => "unix:/var/run/php-fpm/nginx-fpm.sock",
-  include     => ['fastcgi.conf'],
+nginx::resource::location { "${::fqdn}_root":
+  ensure         => 'present',
+  server         => $::fqdn,
+  www_root       => '/etc/puppetlabs/www',
+  location       => '~ \.php$',
+  index_files    => ['index.php'],
+  fastcgi        => "unix:/var/run/php-fpm/nginx-fpm.sock",
+  fastcgi_script => undef,
+  include        => ['fastcgi.conf'],
   }
+
 }
