@@ -41,7 +41,7 @@ file { ['/etc/facter', '/etc/facter/facts.d']:
   }->
 file {'/etc/facter/facts.d/puppetmaster.txt':
   ensure  => file,
-  content => "role=puppetmaster\npuppetenv=production\n",
+  content => "profile=puppetmaster\npuppet_type=puppetmaster\npuppetenv=production\n",
   require => File['/etc/facter', '/etc/facter/facts.d'],
   }->
 notify { 'Setting up r10k and puppet environments':}->
