@@ -60,12 +60,11 @@ mkdir /tmp/modules/php
 curl -L 'https://forge.puppet.com/v3/files/puppet-php-7.1.0.tar.gz' | tar -xz -C /tmp/modules/php --strip-components=1
 
 #disable selinux as its an annoyance for a demo right now.
+/usr/sbin/setenforce 0 
+
+# install r10k gem
 /opt/puppetlabs/puppet/bin/gem install r10k
 
 #/opt/puppetlabs/bin/puppet apply --modulepath=/tmp/modules -e "class { selinux: mode => 'permissive',}"
 /opt/puppetlabs/bin/puppet apply --modulepath=/tmp/modules -e "include start_master::setup_master"
 
-
-
-
-#/opt/puppetlabs/bin/puppet apply --modulepath=/tmp/modules -e "class { puppet_master::installer::setup_r10k:}"
