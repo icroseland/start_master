@@ -1,7 +1,7 @@
 # START_MASTER install configure and startup a master from nothing.
 
 
-This is only kind 0f a module, as it is meant to be run on a host that currently is unmanaged and build a fully functional puppetmaster then setup a tool to install clients to other hosts  From there puppet itself will take over to self manage the master and of course all of the clients.
+This is only kind of a module, as it is meant to be run on a host that currently is unmanaged and build a fully functional puppetmaster then setup a tool to install clients to other hosts  From there puppet itself will take over to self manage the master and of course all of the clients.
 
 ## Requirements
 
