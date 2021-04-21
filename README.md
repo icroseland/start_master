@@ -12,7 +12,7 @@ This is only kind 0f a module, as it is meant to be run on a host that currently
 *  There is good news on DNS, the hosts have any name and this will still work.
 *  Right now, this is also expecting the hosts to be Centos 8.  (see the to do)
 
-### Running
+## Running
 *  on a newly installed host 
 *  sudo - root
 *  [root@hostname_master]#  git clone https://github.com/icroseland/start_master.git
