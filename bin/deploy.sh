@@ -65,6 +65,13 @@ curl -L 'https://forge.puppet.com/v3/files/puppet-php-7.1.0.tar.gz' | tar -xz -C
 # install r10k gem
 /opt/puppetlabs/puppet/bin/gem install r10k
 
+# setup eyaml to work
+/opt/puppetlabs/bin/puppetserver gem install eyaml
+wget -O /tmp/eyaml.zip 'https://github.com/icroseland/demo_eyaml/archive/refs/heads/main.zip'
+unzip /tmp/eyaml.zip -d /etc/puppetlabs
+mv /etc/puppetlabs/demo_eyaml-main /etc/puppetlabs/eyaml
+rm -f /tmp/eyaml.zip
+
 #/opt/puppetlabs/bin/puppet apply --modulepath=/tmp/modules -e "class { selinux: mode => 'permissive',}"
 /opt/puppetlabs/bin/puppet apply --modulepath=/tmp/modules -e "include start_master::setup_master"
 
