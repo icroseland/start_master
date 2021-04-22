@@ -68,6 +68,19 @@ file {'/etc/puppetlabs/r10k/r10k.yaml':
 package {'git':
   ensure => present,
   }
+#ensure eyaml is working.
+file {'/etc/puppetlabs/eyaml':
+  mode => '0400',
+}->
+file {'/etc/puppetlabs/eyaml/keys':
+  mode => '0400',
+}->
+file {'/etc/puppetlabs/eyaml/keys/private_key.pkcs7.pem':
+  mode => '0400',
+}->
+file {'/etc/puppetlabs/eyaml/keys/public_key.pkcs7.pem':
+  mode => '0400',
+}->
 exec { 'deploy environments':
   command => '/opt/puppetlabs/puppet/bin/r10k deploy environment -p',
   require => Exec['install_r10k_gem'],
