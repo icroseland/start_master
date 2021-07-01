@@ -13,7 +13,7 @@ if ($_GET) {
 }
 
 $server_name = '<%= $facts[fqdn] %>';
-echo("#!/bin/bash\n");
+echo("#!/usr/bin/bash\n");
 echo("# setup puppet on a client host\n");
 echo("#\n");
 echo("\n");

@@ -8,7 +8,8 @@ $environment = 'production',
 $r10k_name = 'puppet',
 $r10k_remote = 'https://github.com/icroseland/demo-control.git',
 $r10k_invalid_branches = 'correct',
-$r10k_basedir = '/etc/puppetlabs/code/environments/'
+$r10k_basedir = '/etc/puppetlabs/code/environments/',
+$distro = $::os.name
 ){
 # setup facts to keep things sane.
 $r10k_configured = { sources => {
@@ -24,8 +25,10 @@ File {
   owner => $user,
   group => $group,
 }
-service { 'firewalld':
-  ensure => stopped,
+if $distro == 'Centos' {
+  service { 'firewalld':
+    ensure => stopped,
+  }
 }
 class { '::puppet':
   server                  => true,

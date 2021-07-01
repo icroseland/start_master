@@ -2,17 +2,32 @@
 # run as root on the intended puppet master
 # no git ssh required for this to work against the public repos.
 
+#make this work with different distros.
 
-##yum update -y
+DIST_VER=`cat /etc/[A-Za-z]*[_-][rv]e[lr]* | grep -E "^NAME=" | grep -o -P '(?<=").*?(?=")'`
+if [ $DIST_VER == 'CentOS Linux']
+then
 yum install wget -y
 yum install git -y
 rpm -Uvh http://yum.puppet.com/puppet7/puppet7-release-el-8.noarch.rpm
-
+#disable selinux as its an annoyance for a demo right now.
+/usr/sbin/setenforce 0
+yum install puppet-agent -y
+fi
+if [ $DIST_VER == 'Ubuntu']
+then
+apt-get install wget -y
+apt-get install git  -y 
+U_VER=`lsb_release -a | grep Codename | awk '{split($0,a,":"); print a[2]}' | sed -e 's/^[ \t]*//'`
+wget "https://apt.puppet.com/puppet7-release-$U_VER.deb"
+dpkg -i "puppet7-release-$U_VER.deb"
+apt-add-repository -u  http://apt.puppetlabs.com
+apt-get install puppet-agent -y
+fi
 
 
 mkdir -p /tmp/modules
 cd /tmp/modules
-yum install puppet-agent -y
 echo 'setting up base directory structure'
 /opt/puppetlabs/bin/puppet apply -e  "file { '/tmp/modules': ensure => directory }"
 
@@ -59,8 +74,7 @@ curl -L 'https://forge.puppet.com/v3/files/puppet-nginx-3.0.0.tar.gz' | tar -xz 
 mkdir /tmp/modules/php
 curl -L 'https://forge.puppet.com/v3/files/puppet-php-7.1.0.tar.gz' | tar -xz -C /tmp/modules/php --strip-components=1
 
-#disable selinux as its an annoyance for a demo right now.
-/usr/sbin/setenforce 0 
+
 
 # install r10k gem
 /opt/puppetlabs/puppet/bin/gem install r10k
