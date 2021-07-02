@@ -22,6 +22,7 @@ echo("PROFILE='$profile'\n");
 echo("COLLECTION='$collection'\n");
 echo("APPLICATION='$application'\n");
 echo("ENVIRONMENT='$environment'\n");
+echo("DIST_VER=`cat /etc/[A-Za-z]*[_-][rv]e[lr]* | grep -E "^NAME=" | grep -o -P '(?<=").*?(?=")'`")
 echo("\n");
 echo("IFS=' '\n");
 echo("read -ra ARGS <<< \"\$@\"\n");
@@ -44,20 +45,36 @@ echo("            ;;\n");
 echo("        esac\n");
 echo("done\n");
 
+echo("if [ \$DIST_VER == 'CentOS Linux']\n");
+echo("then\n");
+echo("yum install wget -y\n");
+echo("yum install git -y\n");
 echo("rpm -Uvh http://yum.puppet.com/puppet7/puppet7-release-el-8.noarch.rpm\n");
-echo("yum update -y\n");
+echo("#disable selinux as its an annoyance for a demo right now.\n");
+echo("/usr/sbin/setenforce 0\n");
 echo("yum install puppet-agent -y\n");
+echo("fi\n");
+echo("if [ \$DIST_VER == 'Ubuntu']\n");
+echo("then\n");
+echo("apt-get install wget -y\n");
+echo("apt-get install git  -y\n");
+echo("U_VER=`lsb_release -a | grep Codename | awk '{split(\$0,a,\":\"); print a[2]}' | sed -e 's/^[ \\t]*//'`\n");
+echo("wget \"https://apt.puppet.com/puppet7-release-$U_VER.deb\"\n");
+echo("dpkg -i \"puppet7-release-$U_VER.deb\"\n");
+echo("apt-add-repository -u  http://apt.puppetlabs.com\n");
+echo("apt-get install puppet-agent -y\n");
+echo("fi\n");
 echo("\n");
 echo("mkdir -p /etc/facter/facts.d\n");
 echo("#generate initial facts..\n");
 echo("\n");
-echo("echo \"profile=\$profile\" >> /etc/facter/facts.d/client.txt\n");
+echo("echo \"profile=\$PROFILE\" >> /etc/facter/facts.d/client.txt\n");
 echo("echo \"collection=\$COLLECTION\" >> /etc/facter/facts.d/client.txt\n");
 echo("echo \"application=\$APPLICATION\" >> /etc/facter/facts.d/client.txt\n");
 echo("echo \"environment=\$ENVIRONMENT\" >> /etc/facter/facts.d/client.txt\n");
 echo("echo \"puppet_type=client\" >> /etc/facter/facts.d/client.txt\n");
 echo("\n");
 echo("#first run of puppet to get cert and setup client and host\n");
-echo("/opt/puppetlabs/bin/puppet agent -t --server testmaster1.local\n");
+echo("/opt/puppetlabs/bin/puppet agent -t --server $server_name\n");
 
 ?>
