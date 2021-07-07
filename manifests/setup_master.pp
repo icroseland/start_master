@@ -98,6 +98,24 @@ file {'/etc/puppetlabs/www/client.php':
   content => epp('start_master/etc/puppetlabs/www/client.php.epp'),
   require => File['/etc/puppetlabs/www'],
 }
+file {'/etc/puppetlabs/www/inventory.sh':
+  ensure  => file,
+  mode    => '0555',
+  source  => 'puppet:///modules/start_master/puppetlabs/www/inventory.sh',
+  require => File['/etc/puppetlabs/www'],
+}
+file {'/etc/puppetlabs/www/inventory.php':
+  ensure  => file,
+  mode    => '0555',
+  source  => 'puppet:///modules/start_master/puppetlabs/www/inventory.php',
+  require => File['/etc/puppetlabs/www'],
+}
+exec {'fix_inventory_sh':
+  commmand => "/usr/bin/sed -i 's/XXXZZZXXX/${::fqdn}/g' /etc/puppetlabs/www/inventory.sh",
+  cwd      => '/etc/puppetlabs/www',
+  unless   => '/usr/bin/grep ${::fqdn} /etc/puppetlabs/www/inventory.sh',
+  require  => File['/etc/puppetlabs/www/inventory.sh'],
+  }
 class { 'php':
    ensure       => 'present',
    manage_repos => false,
@@ -119,6 +137,13 @@ user { 'http':
   shell   => '/sbin/nologin',
   gid     => 'http',
 }
+
+file { '/home/nginx':
+  ensure => 'directory',
+  owner  => 'nginx',
+  group  => 'nginx',
+  mode   => '0755'
+  }
 
 include nginx
 
