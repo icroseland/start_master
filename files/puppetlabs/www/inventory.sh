@@ -136,7 +136,16 @@ ip address | sed 2d | \
            echo "\"$i\"," >> /tmp/$FILENAME
        done
     echo "\"Undef\"" >> /tmp/$FILENAME
-   echo "]," >> /tmp/$FILENAME
+    echo "]," >> /tmp/$FILENAME
+
+echo "\"Listening Services\": [" >> /tmp/$FILENAME
+lsof -i | grep -v ESTABLISHED | sed 2d | \
+       while read i
+       do
+           echo "\"$i\"," >> /tmp/$FILENAME
+       done
+    echo "\"Undef\"" >> /tmp/$FILENAME
+   echo "]," >> /tmp/$FILENAME    
 
 echo "\"nameservers\": [" >> /tmp/$FILENAME
 grep nameserver /etc/resolv.conf  | sed 2d | \
