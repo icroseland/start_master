@@ -125,6 +125,9 @@ exec {'fix_inventory_sh':
 
 
 include nginx
+class { 'nginx::params':
+  manage_repo => 'false'
+}->
 nginx::resource::server{ $::fqdn:
   ensure    => present,
   www_root  => '/etc/puppetlabs/www',
@@ -152,7 +155,7 @@ nginx::resource::location { "${::fqdn}_root":
 #  }->
 class { '::php::globals':
   php_version => '7.0'
-}
+}->
 class { 'php':
    ensure       => 'present',
    manage_repos => false,
