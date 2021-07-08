@@ -72,10 +72,9 @@ curl -L 'https://forge.puppet.com/v3/files/puppetlabs-ruby-1.0.1.tar.gz' | tar -
 mkdir /tmp/modules/vcsrepo
 curl -L 'https://forge.puppet.com/v3/files/puppetlabs-vcsrepo-4.0.1.tar.gz' | tar -xz -C /tmp/modules/vcsrepo --strip-components=1
 mkdir /tmp/modules/nginx
-curl -L 'https://forge.puppet.com/v3/files/puppet-nginx-3.0.0.tar.gz' | tar -xz -C /tmp/modules/nginx --strip-components=1
+curl -L 'https://forge.puppet.com/v3/files/puppet-nginx-3.2.0.tar.gz' | tar -xz -C /tmp/modules/nginx --strip-components=1
 mkdir /tmp/modules/php
 curl -L 'https://forge.puppet.com/v3/files/puppet-php-7.1.0.tar.gz' | tar -xz -C /tmp/modules/php --strip-components=1
-
 
 
 # install r10k gem
