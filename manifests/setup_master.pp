@@ -144,10 +144,12 @@ nginx::resource::location { "${::fqdn}_root":
 #  listen_mode  => '0666',
 #  listen       => "/var/run/php-fpm/nginx-fpm.sock",
 #  }->
-
+class { '::php::globals':
+  php_versions => '7.0'
+}
 class { 'php':
    ensure       => 'present',
-   manage_repos => false,
+   manage_repos => true,
    fpm          => true,
    dev          => false,
    composer     => false,

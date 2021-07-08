@@ -25,9 +25,6 @@ dpkg -i "puppet7-release-$U_VER.deb"
 apt-add-repository -u  http://apt.puppetlabs.com
 apt-get install puppet-agent -y
 apt update
-wget https://packages.sury.org/php/apt.gpg
-apt-key add apt.gpg
-echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/php7.list
 fi
 
 
