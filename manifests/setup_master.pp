@@ -111,10 +111,10 @@ file {'/etc/puppetlabs/www/inventory.php':
   require => File['/etc/puppetlabs/www'],
 }
 exec {'fix_inventory_sh':
-  commmand => "/usr/bin/sed -i 's/XXXZZZXXX/${::fqdn}/g' /etc/puppetlabs/www/inventory.sh",
-  cwd      => '/etc/puppetlabs/www',
-  unless   => '/usr/bin/grep ${::fqdn} /etc/puppetlabs/www/inventory.sh',
-  require  => File['/etc/puppetlabs/www/inventory.sh'],
+  command => "/usr/bin/sed -i 's/XXXZZZXXX/${::fqdn}/g' /etc/puppetlabs/www/inventory.sh",
+  cwd     => '/etc/puppetlabs/www',
+  unless  => '/usr/bin/grep ${::fqdn} /etc/puppetlabs/www/inventory.sh',
+  require => File['/etc/puppetlabs/www/inventory.sh'],
   }
 class { 'php':
    ensure       => 'present',
