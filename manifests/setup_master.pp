@@ -9,7 +9,7 @@ $r10k_name = 'puppet',
 $r10k_remote = 'https://github.com/icroseland/demo-control.git',
 $r10k_invalid_branches = 'correct',
 $r10k_basedir = '/etc/puppetlabs/code/environments/',
-$distro = $::os.name
+$distro = $facts['os']['family']
 ){
 # setup facts to keep things sane.
 $r10k_configured = { sources => {
@@ -25,7 +25,7 @@ File {
   owner => $user,
   group => $group,
 }
-if $distro == 'Centos' {
+if $distro == 'RedHat' {
   service { 'firewalld':
     ensure => stopped,
   }
