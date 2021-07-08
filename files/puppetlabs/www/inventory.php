@@ -1,5 +1,5 @@
 <?php
-$uploaddir = '/home/nginx/';
+$uploaddir = '/home/inventory_data/';
 $uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
 
 echo '<pre>';

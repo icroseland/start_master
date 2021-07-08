@@ -174,7 +174,7 @@ user { 'http':
   shell   => '/sbin/nologin',
   gid     => 'http',
 }->
-file { "/home/${puser}":
+file { "/home/inventory_data":
   ensure => 'directory',
   owner  => $puser,
   group  => $pgroup,
