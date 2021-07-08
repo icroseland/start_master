@@ -124,14 +124,7 @@ nginx::resource::server{ $::fqdn:
   www_root  => '/etc/puppetlabs/www',
   autoindex => 'on',
   }->
-php::fpm::pool{$::fqdn:
-  user         => 'nginx',
-  group        => 'nginx',
-  listen_owner => 'nginx',
-  listen_group => 'nginx',
-  listen_mode  => '0666',
-  listen       => "/var/run/php-fpm/nginx-fpm.sock",
-  }->
+
 nginx::resource::location { "${::fqdn}_root":
   ensure         => 'present',
   server         => $::fqdn,
@@ -142,6 +135,16 @@ nginx::resource::location { "${::fqdn}_root":
   fastcgi_script => undef,
   include        => ['fastcgi.conf'],
   }->
+
+php::fpm::pool{$::fqdn:
+  user         => 'nginx',
+  group        => 'nginx',
+  listen_owner => 'nginx',
+  listen_group => 'nginx',
+  listen_mode  => '0666',
+  listen       => "/var/run/php-fpm/nginx-fpm.sock",
+  }->
+  
 class { 'php':
    ensure       => 'present',
    manage_repos => true,
