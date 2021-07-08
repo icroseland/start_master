@@ -118,7 +118,7 @@ exec {'fix_inventory_sh':
   }
 class { 'php':
    ensure       => 'present',
-   manage_repos => false,
+   manage_repos => true,
    fpm          => true,
    dev          => false,
    composer     => false,
