@@ -29,11 +29,11 @@ if $distro == 'RedHat' {
   service { 'firewalld':
     ensure => stopped,
   }
-  $puser = 'nginx',
+  $puser = 'nginx'
   $pgroup = 'nginx' 
 }
 if $distro == 'Debian' {
-  $puser = 'www-data',
+  $puser = 'www-data'
   $pgroup = 'www-data' 
 }
 class { '::puppet':
