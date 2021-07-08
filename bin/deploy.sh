@@ -25,6 +25,8 @@ dpkg -i "puppet7-release-$U_VER.deb"
 apt-add-repository -u  http://apt.puppetlabs.com
 apt-get install puppet-agent -y
 apt update
+# this is an ugly hack
+/usr/bin/apt-key adv --no-tty --keyserver hkp://keyserver.ubuntu.com:80 --recv 573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62
 fi
 
 

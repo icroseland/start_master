@@ -123,7 +123,6 @@ exec {'fix_inventory_sh':
   require => File['/etc/puppetlabs/www/inventory.sh'],
   }
 
-
 include nginx
 nginx::resource::server{ $::fqdn:
   ensure    => present,
@@ -137,19 +136,20 @@ nginx::resource::location { "${::fqdn}_root":
   www_root       => '/etc/puppetlabs/www',
   location       => '~ \.php$',
   index_files    => ['index.php'],
-  fastcgi        => "unix:/var/run/php-fpm/nginx-fpm.sock",
+  fastcgi        => 'unix:/run/php/php7.0-fpm.sock',
   fastcgi_script => undef,
   include        => ['fastcgi.conf'],
-  }->
+  }
 
-#php::fpm::pool{$::fqdn:
-#  user         => 'nginx',
-#  group        => 'nginx',
-#  listen_owner => 'nginx',
-#  listen_group => 'nginx',
-#  listen_mode  => '0666',
-#  listen       => "/var/run/php-fpm/nginx-fpm.sock",
-#  }->
+php::fpm::pool{$::fqdn:
+  user         => $puser,
+  group        => $pgroup,
+  listen_owner => $puser,
+  listen_group => $pgroup,
+  listen_mode  => '0660',
+  listen       => '/run/php/php7.0-fpm.sock',
+  }
+
 class { '::php::globals':
   php_version => '7.0'
 }->
@@ -163,8 +163,8 @@ class { 'php':
    phpunit      => false,
    fpm_user     => $puser,
    fpm_group    => $pgroup,
-   fpm_pools    => {},
 }->
+
 group { 'http':
   ensure => present
 }->
@@ -180,5 +180,7 @@ file { "/home/${puser}":
   group  => $pgroup,
   mode   => '0755'
   }
+
+
 
 }
