@@ -145,7 +145,7 @@ nginx::resource::location { "${::fqdn}_root":
 #  listen       => "/var/run/php-fpm/nginx-fpm.sock",
 #  }->
 class { '::php::globals':
-  php_versions => '7.0'
+  php_version => '7.0'
 }
 class { 'php':
    ensure       => 'present',
