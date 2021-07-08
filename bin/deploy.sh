@@ -5,7 +5,7 @@
 #make this work with different distros.
 
 DIST_VER=`cat /etc/[A-Za-z]*[_-][rv]e[lr]* | grep -E "^NAME=" | grep -o -P '(?<=").*?(?=")'`
-if [ $DIST_VER == 'CentOS Linux']
+if [ "$DIST_VER" == "CentOS Linux"]
 then
 yum install wget -y
 yum install git -y
@@ -14,7 +14,7 @@ rpm -Uvh http://yum.puppet.com/puppet7/puppet7-release-el-8.noarch.rpm
 /usr/sbin/setenforce 0
 yum install puppet-agent -y
 fi
-if [ $DIST_VER == 'Ubuntu']
+if [ "$DIST_VER" == "Ubuntu"]
 then
 apt-get install wget -y
 apt-get install git  -y 
