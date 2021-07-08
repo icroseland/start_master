@@ -136,15 +136,15 @@ nginx::resource::location { "${::fqdn}_root":
   include        => ['fastcgi.conf'],
   }->
 
-php::fpm::pool{$::fqdn:
-  user         => 'nginx',
-  group        => 'nginx',
-  listen_owner => 'nginx',
-  listen_group => 'nginx',
-  listen_mode  => '0666',
-  listen       => "/var/run/php-fpm/nginx-fpm.sock",
-  }->
-  
+#php::fpm::pool{$::fqdn:
+#  user         => 'nginx',
+#  group        => 'nginx',
+#  listen_owner => 'nginx',
+#  listen_group => 'nginx',
+#  listen_mode  => '0666',
+#  listen       => "/var/run/php-fpm/nginx-fpm.sock",
+#  }->
+
 class { 'php':
    ensure       => 'present',
    manage_repos => true,
