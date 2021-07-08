@@ -18,11 +18,16 @@ if [ "$DIST_VER" == "Ubuntu" ]
 then
 apt-get install wget -y
 apt-get install git  -y 
+apt install -y curl wget gnupg2 ca-certificates lsb-release apt-transport-https
 U_VER=`lsb_release -a | grep Codename | awk '{split($0,a,":"); print a[2]}' | sed -e 's/^[ \t]*//'`
 wget "https://apt.puppet.com/puppet7-release-$U_VER.deb"
 dpkg -i "puppet7-release-$U_VER.deb"
 apt-add-repository -u  http://apt.puppetlabs.com
 apt-get install puppet-agent -y
+apt update
+wget https://packages.sury.org/php/apt.gpg
+apt-key add apt.gpg
+echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/php7.list
 fi
 
 

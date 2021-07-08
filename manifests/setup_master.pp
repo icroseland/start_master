@@ -147,7 +147,7 @@ nginx::resource::location { "${::fqdn}_root":
 
 class { 'php':
    ensure       => 'present',
-   manage_repos => true,
+   manage_repos => false,
    fpm          => true,
    dev          => false,
    composer     => false,
