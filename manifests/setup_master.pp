@@ -116,6 +116,32 @@ exec {'fix_inventory_sh':
   unless  => '/usr/bin/grep ${::fqdn} /etc/puppetlabs/www/inventory.sh',
   require => File['/etc/puppetlabs/www/inventory.sh'],
   }
+
+
+include nginx ->
+nginx::resource::server{ $::fqdn:
+  ensure    => present,
+  www_root  => '/etc/puppetlabs/www',
+  autoindex => 'on',
+  }->
+php::fpm::pool{$::fqdn:
+  user         => 'nginx',
+  group        => 'nginx',
+  listen_owner => 'nginx',
+  listen_group => 'nginx',
+  listen_mode  => '0666',
+  listen       => "/var/run/php-fpm/nginx-fpm.sock",
+  }->
+nginx::resource::location { "${::fqdn}_root":
+  ensure         => 'present',
+  server         => $::fqdn,
+  www_root       => '/etc/puppetlabs/www',
+  location       => '~ \.php$',
+  index_files    => ['index.php'],
+  fastcgi        => "unix:/var/run/php-fpm/nginx-fpm.sock",
+  fastcgi_script => undef,
+  include        => ['fastcgi.conf'],
+  }->
 class { 'php':
    ensure       => 'present',
    manage_repos => true,
@@ -127,48 +153,21 @@ class { 'php':
    fpm_user     => 'nginx',
    fpm_group    => 'nginx',
    fpm_pools    => {},
-}
+}->
 group { 'http':
   ensure => present
-}
+}->
 user { 'http':
   ensure  => present,
   comment => 'make php work',
   shell   => '/sbin/nologin',
   gid     => 'http',
-}
-
+}->
 file { '/home/nginx':
   ensure => 'directory',
   owner  => 'nginx',
   group  => 'nginx',
   mode   => '0755'
-  }
-
-include nginx
-
-nginx::resource::server{ $::fqdn:
-  ensure    => present,
-  www_root  => '/etc/puppetlabs/www',
-  autoindex => 'on',
-  }  
-php::fpm::pool{$::fqdn:
-  user         => 'nginx',
-  group        => 'nginx',
-  listen_owner => 'nginx',
-  listen_group => 'nginx',
-  listen_mode  => '0666',
-  listen       => "/var/run/php-fpm/nginx-fpm.sock",
-  }
-nginx::resource::location { "${::fqdn}_root":
-  ensure         => 'present',
-  server         => $::fqdn,
-  www_root       => '/etc/puppetlabs/www',
-  location       => '~ \.php$',
-  index_files    => ['index.php'],
-  fastcgi        => "unix:/var/run/php-fpm/nginx-fpm.sock",
-  fastcgi_script => undef,
-  include        => ['fastcgi.conf'],
   }
 
 }
