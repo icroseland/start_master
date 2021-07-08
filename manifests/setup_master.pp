@@ -118,7 +118,7 @@ exec {'fix_inventory_sh':
   }
 
 
-include nginx ->
+include nginx
 nginx::resource::server{ $::fqdn:
   ensure    => present,
   www_root  => '/etc/puppetlabs/www',
