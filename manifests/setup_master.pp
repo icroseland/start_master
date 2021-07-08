@@ -125,24 +125,36 @@ exec {'fix_inventory_sh':
 
 
 class { 'nginx':
-  manage_repo => false
+  ensure          => present,
+  manage_repo     => false,
+  www_root        => '/etc/puppetlabs/www',
+  autoindex       => 'on',
+  location        => '~ \.php$',
+  index_files     => ['index.php'],
+  fastcgi         => "unix:/var/run/php-fpm/nginx-fpm.sock",
+  fastcgi_script  => undef,
+  include         => ['fastcgi.conf'],
+  listen_owner    => $puser,
+  listen_group    => $pgroup,
+  listen_mode     => '0666',
+  listen          => "/var/run/php-fpm/nginx-fpm.sock",
 }->
-nginx::resource::server{ $::fqdn:
-  ensure    => present,
-  www_root  => '/etc/puppetlabs/www',
-  autoindex => 'on',
-  }->
+#nginx::resource::server{ $::fqdn:
+#  ensure    => present,
+#  www_root  => '/etc/puppetlabs/www',
+#  autoindex => 'on',
+#  }->
 
-nginx::resource::location { "${::fqdn}_root":
-  ensure         => 'present',
-  server         => $::fqdn,
-  www_root       => '/etc/puppetlabs/www',
-  location       => '~ \.php$',
-  index_files    => ['index.php'],
-  fastcgi        => "unix:/var/run/php-fpm/nginx-fpm.sock",
-  fastcgi_script => undef,
-  include        => ['fastcgi.conf'],
-  }->
+#nginx::resource::location { "${::fqdn}_root":
+#  ensure         => 'present',
+#  server         => $::fqdn,
+#  www_root       => '/etc/puppetlabs/www',
+#  location       => '~ \.php$',
+#  index_files    => ['index.php'],
+#  fastcgi        => "unix:/var/run/php-fpm/nginx-fpm.sock",
+#  fastcgi_script => undef,
+#  include        => ['fastcgi.conf'],
+#  }->
 
 #php::fpm::pool{$::fqdn:
 #  user         => 'nginx',
