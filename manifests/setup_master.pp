@@ -29,6 +29,12 @@ if $distro == 'RedHat' {
   service { 'firewalld':
     ensure => stopped,
   }
+  $puser = 'nginx',
+  $pgroup = 'nginx' 
+}
+if $distro == 'Debian' {
+  $puser = 'www-data',
+  $pgroup = 'www-data' 
 }
 class { '::puppet':
   server                  => true,
@@ -155,8 +161,8 @@ class { 'php':
    composer     => false,
    pear         => true,
    phpunit      => false,
-   fpm_user     => 'nginx',
-   fpm_group    => 'nginx',
+   fpm_user     => $puser,
+   fpm_group    => $pgroup,
    fpm_pools    => {},
 }->
 group { 'http':
@@ -168,10 +174,10 @@ user { 'http':
   shell   => '/sbin/nologin',
   gid     => 'http',
 }->
-file { '/home/nginx':
+file { "/home/${puser}":
   ensure => 'directory',
-  owner  => 'nginx',
-  group  => 'nginx',
+  owner  => $puser,
+  group  => $pgroup,
   mode   => '0755'
   }
 
