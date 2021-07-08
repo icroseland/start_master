@@ -124,8 +124,7 @@ exec {'fix_inventory_sh':
   }
 
 
-include nginx
-class { 'nginx::params':
+include class { 'nginx':
   manage_repo => 'false'
 }->
 nginx::resource::server{ $::fqdn:
