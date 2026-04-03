@@ -5,7 +5,7 @@
 #make this work with different distros.
 
 DIST_VER=`cat /etc/[A-Za-z]*[_-][rv]e[lr]* | grep -E "^NAME=" | grep -o -P '(?<=").*?(?=")'`
-if [ "$DIST_VER" == "CentOS Linux" ]
+if [[ "$DIST_VER" == "CentOS Linux" ] || "$DIST_VER" == "AlmaLinux" ]];
 then
 yum install wget -y
 yum install git -y
