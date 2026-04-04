@@ -1,0 +1,17 @@
+#!/usr/bin/bash
+
+
+set -euo pipefail
+
+YAML_FILE='./list.yaml'
+REPO_NAME='https://forge.puppet.com/v3/files/'
+DEST_DIR='/tmp/loads'
+
+mkdir -p "$DEST_DIR"
+
+grep -E '^\s*-\s*.*\.tar\.gz$' $YAML_FILE | sed -E 's/^[[:space:]]*-[[:space:]]*//'| while read -r url; do
+    CURRENT_NAME="$REPO_NAME$url"
+    #echo "full usr: $DEST_DIR/$url  $CURRENT_NAME"
+    curl -L --fail --remote-name -o "$DEST_DIR/$url" "$CURRENT_NAME"
+    done
+

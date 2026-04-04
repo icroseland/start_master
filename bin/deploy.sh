@@ -1,18 +1,66 @@
 #!/bin/bash
-# run as root on the intended puppet master
+# run as root on the intended puppet CA puppetserver
 # no git ssh required for this to work against the public repos.
 
 #make this work with different distros.
 
+
+
+set -euo pipefail
+
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        -r|--puppet_release) target="$2"; shift ;;
+        -p|--puppet_version) uglify=1 ;;
+	-h|--help) echo "help passed"; exit 1 ;;
+        *) echo "Unknown parameter passed: $1"; exit 1 ;;
+    esac
+    shift
+done
+
+#echo "r = $2"; exit 1 
+
+
+#for i in "$@"; do
+#  case $i in
+#    -r=*|--puppet_release=*)
+#      EXTENSION="${i#*=}"
+#      shift # past argument=value
+#      ;;
+#    -p=*|--puppet_version=*)
+#      EXTENSION="${i#*=}"
+#      shift # past argument=value
+#      ;;
+#    -h=*|--help=*)
+#      EXTENSION="${i#*=}"
+#      shift # past argument=value
+#      ;;    
+#    -*|--*)
+#      echo "Unknown option $i"
+#      exit 1
+#      ;;
+#    *)
+#      ;;
+#  esac
+#done
+
 DIST_VER=`cat /etc/[A-Za-z]*[_-][rv]e[lr]* | grep -E "^NAME=" | grep -o -P '(?<=").*?(?=")'`
-if [[ "$DIST_VER" == "CentOS Linux" ] || "$DIST_VER" == "AlmaLinux" ]];
+if 
+    [ "$DIST_VER" == "CentOS Linux"; SN=el ] ||
+	[ "$DIST_VER" == "AlmaLinux";  SN=el ] ||
+	[ "$DIST_VER" == "Fedora Linux"; SN=fedora] ||
+	[ "$DIST_VER" == "Oracle Linux"; SN=el  ] ||
+	[ "$DIST_VER" == "Rocky Linux"; SN=el ];
 then
-yum install wget -y
-yum install git -y
-rpm -Uvh http://yum.puppet.com/puppet7/puppet7-release-el-8.noarch.rpm
+
+dnf install wget -y
+dnf install git -y
+LSB=`lsb_release -rs`
+GET_FILE=`curl -k -s https://yum.voxpupuli.org/ | grep -oP '(?<=href=")[^"]+' | grep -v '^/' | grep $DIST_VER-$LSB | sort -r | head -a`
+rpm -Uvh "https://yum.voxpopuli.org/$GET_FILE"
 #disable selinux as its an annoyance for a demo right now.
-/usr/sbin/setenforce 0
-yum install puppet-agent -y
+##/usr/sbin/setenforce 0
+yum install openvox-server -y
 fi
 if [ "$DIST_VER" == "Ubuntu" ]
 then
@@ -41,42 +89,22 @@ unzip /tmp/start_master.zip -d /tmp/modules
 mv /tmp/modules/start_master-main /tmp/modules/start_master
 rm -f /tmp/start_master.zip 
 echo 'loading modules from puppetlabs'
-mkdir /tmp/modules/stdlib
-curl -L 'https://forge.puppet.com/v3/files/puppetlabs-stdlib-5.1.0.tar.gz' | tar -xz -C /tmp/modules/stdlib --strip-components=1
-mkdir /tmp/modules/puppet
-curl -L 'https://forge.puppet.com/v3/files/theforeman-puppet-14.2.1.tar.gz' | tar -xz -C /tmp/modules/puppet --strip-components=1
-mkdir /tmp/modules/apache
-curl -L 'https://forge.puppet.com/v3/files/puppetlabs-apache-3.4.0.tar.gz' | tar -xz -C /tmp/modules/apache --strip-components=1
-mkdir /tmp/modules/concat
-curl -L 'https://forge.puppet.com/v3/files/puppetlabs-concat-5.1.0.tar.gz' | tar -xz -C /tmp/modules/concat --strip-components=1
-mkdir /tmp/modules/extlib
-curl -L 'https://forge.puppet.com/v3/files/puppet-extlib-3.0.0.tar.gz' | tar -xz -C /tmp/modules/extlib --strip-components=1
-mkdir /tmp/modules/foreman
-curl -L 'https://forge.puppet.com/v3/files/theforeman-foreman-10.0.0.tar.gz' | tar -xz -C /tmp/modules/foreman --strip-components=1
-mkdir /tmp/modules/apt
-curl -L 'https://forge.puppet.com/v3/files/puppetlabs-apt-6.1.1.tar.gz' | tar -xz -C /tmp/modules/apt --strip-components=1
-mkdir /tmp/modules/postgresql
-curl -L 'https://forge.puppet.com/v3/files/puppetlabs-postgresql-5.10.0.tar.gz' | tar -xz -C /tmp/modules/postgresql --strip-components=1
-mkdir /tmp/modules/selinux
-curl -L 'https://forge.puppet.com/v3/files/puppet-selinux-1.6.1.tar.gz' | tar -xz -C /tmp/modules/selinux --strip-components=1
-mkdir /tmp/modules/systemd
-curl -L 'https://forge.puppet.com/v3/files/camptocamp-systemd-2.6.0.tar.gz' | tar -xz -C /tmp/modules/systemd --strip-components=1
-mkdir /tmp/modules/r10k
-curl -L 'https://forge.puppet.com/v3/files/puppet-r10k-9.0.0.tar.gz' | tar -xz -C /tmp/modules/r10k --strip-components=1
-mkdir /tmp/modules/git
-curl -L 'https://forge.puppet.com/v3/files/puppetlabs-git-0.5.0.tar.gz' | tar -xz -C /tmp/modules/git --strip-components=1
-mkdir /tmp/modules/inifile
-curl -L 'https://forge.puppet.com/v3/files/puppetlabs-inifile-5.0.1.tar.gz' | tar -xz -C /tmp/modules/inifile --strip-components=1
-mkdir /tmp/modules/translate
-curl -L 'https://forge.puppet.com/v3/files/puppetlabs-translate-2.2.0.tar.gz' | tar -xz -C /tmp/modules/translate --strip-components=1
-mkdir /tmp/modules/ruby
-curl -L 'https://forge.puppet.com/v3/files/puppetlabs-ruby-1.0.1.tar.gz' | tar -xz -C /tmp/modules/ruby --strip-components=1
-mkdir /tmp/modules/vcsrepo
-curl -L 'https://forge.puppet.com/v3/files/puppetlabs-vcsrepo-4.0.1.tar.gz' | tar -xz -C /tmp/modules/vcsrepo --strip-components=1
-mkdir /tmp/modules/nginx
-curl -L 'https://forge.puppet.com/v3/files/puppet-nginx-3.2.0.tar.gz' | tar -xz -C /tmp/modules/nginx --strip-components=1
-mkdir /tmp/modules/php
-curl -L 'https://forge.puppet.com/v3/files/puppet-php-7.1.0.tar.gz' | tar -xz -C /tmp/modules/php --strip-components=1
+
+grep -E '^\s*-\s*.*\.tar\.gz$' $YAML_FILE | sed -E 's/^[[:space:]]*-[[:space:]]*//'| while rea
+d -r url; do
+    echo "XX"
+
+    CURRENT_NAME="$REPO_NAME$url"
+    DEST_FILE="$DEST_DIR/$url"
+
+    SN1=${url#*-}
+    SN2=${SN1%%-*}
+    SHORT_NAME=$SN2
+    DEST_NAME="$DEST_DIR/$SHORT_NAME"
+    echo $SHORT_NAME
+    mkdir -p $DEST_NAME
+    curl -L --fail  "$CURRENT_NAME" | tar -xz -C $DEST_NAME --strip-components=1
+    done
 
 
 # install r10k gem
