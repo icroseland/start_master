@@ -72,6 +72,7 @@ LSB=$(
 
 
 GET_FILE=`curl -k -s https://yum.voxpupuli.org/ | grep -oP '(?<=href=")[^"]+' | grep -v '^/' | grep $DIST_VER-$LSB | sort -r | head -n 1`
+echo "rpm -Uvh https://yum.voxpopuli.org/$GET_FILE"
 rpm -Uvh "https://yum.voxpopuli.org/$GET_FILE"
 #disable selinux as its an annoyance for a demo right now.
 ##/usr/sbin/setenforce 0
