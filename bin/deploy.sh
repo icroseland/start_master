@@ -65,7 +65,7 @@ LSB=$(
         lsb_release -rs
     elif [ -f /etc/redhat-release ]; then
         # crude fallback (extract first number)
-        grep -oE '[0-9]+(\.[0-9]+)?' /etc/redhat-release | head -n 1
+        grep -oE '[0-9]+?' /etc/redhat-release | head -n 1
     fi
 )
 echo "LSB eq $DIST_VER  $LSB"
