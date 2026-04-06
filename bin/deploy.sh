@@ -56,7 +56,21 @@ esac
 
 dnf install wget -y
 dnf install git -y
-LSB=`lsb_release -rs`
+
+LSB=$(
+    if [ -f /etc/os-release ]; then
+        . /etc/os-release
+        echo "$VERSION_ID"
+    elif command -v lsb_release >/dev/null 2>&1; then
+        lsb_release -rs
+    elif [ -f /etc/redhat-release ]; then
+        # crude fallback (extract first number)
+        grep -oE '[0-9]+(\.[0-9]+)?' /etc/redhat-release | head -1
+    fi
+)
+
+
+
 GET_FILE=`curl -k -s https://yum.voxpupuli.org/ | grep -oP '(?<=href=")[^"]+' | grep -v '^/' | grep $DIST_VER-$LSB | sort -r | head -a`
 rpm -Uvh "https://yum.voxpopuli.org/$GET_FILE"
 #disable selinux as its an annoyance for a demo right now.
