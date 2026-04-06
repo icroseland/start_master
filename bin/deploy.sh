@@ -60,12 +60,11 @@ dnf install git -y
 LSB=$(
     if [ -f /etc/os-release ]; then
         . /etc/os-release
-        echo "$VERSION_ID"
+        echo "${VERSION_ID%%.*}"
     elif command -v lsb_release >/dev/null 2>&1; then
-        lsb_release -rs
+        lsb_release -rs | cut -d. -f1
     elif [ -f /etc/redhat-release ]; then
-        # crude fallback (extract first number)
-        grep -oE '[0-9]+?' /etc/redhat-release | head -n 1
+        grep -oE '[0-9]+' /etc/redhat-release | head -1
     fi
 )
 echo "LSB eq $DIST_VER  $LSB"
