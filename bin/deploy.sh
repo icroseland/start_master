@@ -45,13 +45,14 @@ done
 #done
 
 DIST_VER=`cat /etc/[A-Za-z]*[_-][rv]e[lr]* | grep -E "^NAME=" | grep -o -P '(?<=").*?(?=")'`
-if 
-    [ "$DIST_VER" == "CentOS Linux"; SN=el ] ||
-	[ "$DIST_VER" == "AlmaLinux";  SN=el ] ||
-	[ "$DIST_VER" == "Fedora Linux"; SN=fedora] ||
-	[ "$DIST_VER" == "Oracle Linux"; SN=el  ] ||
-	[ "$DIST_VER" == "Rocky Linux"; SN=el ];
-then
+case "$DIST_VER" in
+    "CentOS Linux"|"AlmaLinux"|"Oracle Linux"|"Rocky Linux")
+        SN='el'
+        ;;
+    "Fedora Linux")
+        SN='fedora'
+        ;;
+esac
 
 dnf install wget -y
 dnf install git -y
