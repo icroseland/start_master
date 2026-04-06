@@ -68,7 +68,7 @@ LSB=$(
         grep -oE '[0-9]+(\.[0-9]+)?' /etc/redhat-release | head -n 1
     fi
 )
-
+echo "LSB eq $LSB"
 
 
 GET_FILE=`curl -k -s https://yum.voxpupuli.org/ | grep -oP '(?<=href=")[^"]+' | grep -v '^/' | grep $DIST_VER-$LSB | sort -r | head -n 1`
