@@ -50,6 +50,7 @@ done
 #  esac
 #done
 
+if [ -f /etc/redhat-release]; then
 DIST_VER=`cat /etc/[A-Za-z]*[_-][rv]e[lr]* | grep -E "^NAME=" | grep -o -P '(?<=").*?(?=")'`
 case "$DIST_VER" in
     "CentOS Linux"|"AlmaLinux"|"Oracle Linux"|"Rocky Linux")
@@ -82,8 +83,11 @@ echo "rpm -Uvh https://yum.voxpupuli.org/$GET_FILE"
 #disable selinux as its an annoyance for a demo right now.
 ##/usr/sbin/setenforce 0
 #dnf -yq install openvox-server  
+
 echo 'quick test'
+
 fi
+
 echo 'package installed moving on to grab modules'
 
 if [ "$DIST_VER" == "Ubuntu" ]
