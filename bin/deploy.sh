@@ -96,8 +96,7 @@ mv /tmp/modules/start_master-main /tmp/modules/start_master
 rm -f /tmp/start_master.zip 
 echo 'loading modules from puppetlabs'
 
-grep -E '^\s*-\s*.*\.tar\.gz$' $YAML_FILE | sed -E 's/^[[:space:]]*-[[:space:]]*//'| while rea
-d -r url; do
+grep -E '^\s*-\s*.*\.tar\.gz$' $YAML_FILE | sed -E 's/^[[:space:]]*-[[:space:]]*//'| while read -r url; do
     echo "XX"
 
     CURRENT_NAME="$REPO_NAME$url"
