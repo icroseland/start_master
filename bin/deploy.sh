@@ -9,7 +9,7 @@ CURRENT_DIR=`pwd`
 set -euo pipefail
 YAML_FILE="$CURRENT_DIR/list.yaml"
 REPO_NAME='https://forge.puppet.com/v3/files/'
-DEST_DIR='/tmp/loads'
+DEST_DIR='/tmp/modules'
 
 
 
