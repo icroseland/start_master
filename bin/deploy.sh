@@ -26,7 +26,7 @@ done
 
 ######################red hats
 
-if [ -f /etc/redhat-release]; then
+if [ -f /etc/redhat-release ]; then
 
     DIST_VER=`cat /etc/[A-Za-z]*[_-][rv]e[lr]* | grep -E "^NAME=" | grep -o -P '(?<=").*?(?=")'`
     case "$DIST_VER" in
