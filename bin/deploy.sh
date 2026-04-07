@@ -7,6 +7,12 @@
 
 
 set -euo pipefail
+YAML_FILE='./list.yaml'
+REPO_NAME='https://forge.puppet.com/v3/files/'
+DEST_DIR='/tmp/loads'
+
+
+
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
@@ -77,6 +83,8 @@ rpm -Uvh "https://yum.voxpupuli.org/$GET_FILE"
 ##/usr/sbin/setenforce 0
 yum install openvox-server -y
 fi
+echo 'package installed moving on to grab modules'
+
 if [ "$DIST_VER" == "Ubuntu" ]
 then
 apt-get install wget -y
