@@ -40,6 +40,8 @@ if [ -f /etc/redhat-release ]; then
 
     dnf install wget -y
     dnf install git -y
+    dnf install unzip -y
+    dnf install curl -y
 
     LSB=$(
         if [ -f /etc/os-release ]; then
