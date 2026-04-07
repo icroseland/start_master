@@ -3,7 +3,7 @@
 class start_master::setup_master(
 $user = 'puppet',
 $group = 'puppet',
-$ip = $::ipaddress,
+$ip = $networking['ip'],
 $environment = 'production',
 $r10k_name = 'puppet',
 $r10k_remote = 'https://github.com/icroseland/demo-control.git',
