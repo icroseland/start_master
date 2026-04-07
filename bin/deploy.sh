@@ -24,71 +24,47 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
-#echo "r = $2"; exit 1 
-
-
-#for i in "$@"; do
-#  case $i in
-#    -r=*|--puppet_release=*)
-#      EXTENSION="${i#*=}"
-#      shift # past argument=value
-#      ;;
-#    -p=*|--puppet_version=*)
-#      EXTENSION="${i#*=}"
-#      shift # past argument=value
-#      ;;
-#    -h=*|--help=*)
-#      EXTENSION="${i#*=}"
-#      shift # past argument=value
-#      ;;    
-#    -*|--*)
-#      echo "Unknown option $i"
-#      exit 1
-#      ;;
-#    *)
-#      ;;
-#  esac
-#done
+######################red hats
 
 if [ -f /etc/redhat-release]; then
-DIST_VER=`cat /etc/[A-Za-z]*[_-][rv]e[lr]* | grep -E "^NAME=" | grep -o -P '(?<=").*?(?=")'`
-case "$DIST_VER" in
-    "CentOS Linux"|"AlmaLinux"|"Oracle Linux"|"Rocky Linux")
-        SN='el'
-        ;;
-    "Fedora Linux")
-        SN='fedora'
-        ;;
-esac
 
-dnf install wget -y
-dnf install git -y
+    DIST_VER=`cat /etc/[A-Za-z]*[_-][rv]e[lr]* | grep -E "^NAME=" | grep -o -P '(?<=").*?(?=")'`
+    case "$DIST_VER" in
+        "CentOS Linux"|"AlmaLinux"|"Oracle Linux"|"Rocky Linux")
+            SN='el'
+            ;;  
+        "Fedora Linux")
+            SN='fedora'
+            ;;
+    esac
 
-LSB=$(
-    if [ -f /etc/os-release ]; then
-        . /etc/os-release
-        echo "${VERSION_ID%%.*}"
-    elif command -v lsb_release >/dev/null 2>&1; then
-        lsb_release -rs | cut -d. -f1
-    elif [ -f /etc/redhat-release ]; then
-        grep -oE '[0-9]+' /etc/redhat-release | head -1
-    fi
-)
-echo "LSB eq $DIST_VER  $LSB"
+    dnf install wget -y
+    dnf install git -y
 
+    LSB=$(
+        if [ -f /etc/os-release ]; then
+            . /etc/os-release
+            echo "${VERSION_ID%%.*}"
+        elif command -v lsb_release >/dev/null 2>&1; then
+            lsb_release -rs | cut -d. -f1
+        elif [ -f /etc/redhat-release ]; then
+            grep -oE '[0-9]+' /etc/redhat-release | head -1
+        fi
+    )
 
-GET_FILE=`curl -k -s https://yum.voxpupuli.org/ | grep -oP '(?<=href=")[^"]+' | grep -v '^/' | grep "$SN-$LSB" | sort -r | head -n 1`
-echo "rpm -Uvh https://yum.voxpupuli.org/$GET_FILE"
-###rpm -i https://yum.voxpupuli.org/$GET_FILE
-#disable selinux as its an annoyance for a demo right now.
-##/usr/sbin/setenforce 0
-#dnf -yq install openvox-server  
+    echo "LSB eq $DIST_VER  $LSB"
+    GET_FILE=`curl -k -s https://yum.voxpupuli.org/ | grep -oP '(?<=href=")[^"]+' | grep -v '^/' | grep "$SN-$LSB" | sort -r | head -n 1`
+    echo "rpm -Uvh https://yum.voxpupuli.org/$GET_FILE"
+    ###rpm -i https://yum.voxpupuli.org/$GET_FILE
+    #disable selinux as its an annoyance for a demo right now.
+    ##/usr/sbin/setenforce 0
+    #dnf -yq install openvox-server  
 
-echo 'quick test'
+    echo 'quick test'
 
 fi
 
-echo 'package installed moving on to grab modules'
+##################### Debians
 
 if [ "$DIST_VER" == "Ubuntu" ]
 then
