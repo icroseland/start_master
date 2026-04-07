@@ -82,6 +82,7 @@ rpm -Uvh "https://yum.voxpupuli.org/$GET_FILE"
 #disable selinux as its an annoyance for a demo right now.
 ##/usr/sbin/setenforce 0
 dnf install openvox-server -y
+echo 'quick test'
 fi
 echo 'package installed moving on to grab modules'
 
