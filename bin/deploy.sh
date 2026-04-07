@@ -4,6 +4,8 @@
 
 #make this work with different distros.
 
+#pre cleanup
+rm -rf /tmp/modules/
 
 CURRENT_DIR=`pwd`
 set -euo pipefail
