@@ -78,7 +78,7 @@ echo "LSB eq $DIST_VER  $LSB"
 
 GET_FILE=`curl -k -s https://yum.voxpupuli.org/ | grep -oP '(?<=href=")[^"]+' | grep -v '^/' | grep "$SN-$LSB" | sort -r | head -n 1`
 echo "rpm -Uvh https://yum.voxpupuli.org/$GET_FILE"
-dnf -yq https://yum.voxpupuli.org/$GET_FILE
+rpm -i https://yum.voxpupuli.org/$GET_FILE
 #disable selinux as its an annoyance for a demo right now.
 ##/usr/sbin/setenforce 0
 #dnf -yq install openvox-server  
