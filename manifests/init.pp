@@ -4,14 +4,15 @@
 class start_master(
 $user = 'puppet',
 $group = 'puppet',
-$ip = $::ipaddress,
+$ip = $facts['networking']['ip'],
 $environment = 'production',
 $r10k_name = 'puppet',
 $r10k_remote = 'https://github.com/icroseland/demo-control.git',
 $r10k_invalid_branches = 'correct',
 $r10k_basedir = '/etc/puppetlabs/code/environments/',
 $distro = $facts['os']['family'],
-$puppetdb_server = $::fqdn
+$puppetdb_server = = $facts['networking']['fqdn'],
+$fqdn = $facts['networking']['fqdn'],
 ){
 # setup facts to keep things sane.
 $r10k_configured = { sources => {
@@ -38,7 +39,7 @@ if $distro == 'Debian' {
   $puser = 'www-data'
   $pgroup = 'www-data' 
 }
-if $puppetdb_server == $::fqdn {
+if $puppetdb_server == $fqdn {
   class { 'start_master::db_setup': }
 }->
 class { '::puppet':
@@ -102,15 +103,15 @@ file {'/etc/puppetlabs/www/client.php':
   require => File['/etc/puppetlabs/www'],
 }
 include nginx
-nginx::resource::server{ $::fqdn:
+nginx::resource::server{ $fqdn:
   ensure    => present,
   www_root  => '/etc/puppetlabs/www',
   autoindex => 'on',
   }->
 
-nginx::resource::location { "${::fqdn}_root":
+nginx::resource::location { "${fqdn}_root":
   ensure         => 'present',
-  server         => $::fqdn,
+  server         => $fqdn,
   www_root       => '/etc/puppetlabs/www',
   location       => '~ \.php$',
   index_files    => ['index.php'],
@@ -119,7 +120,7 @@ nginx::resource::location { "${::fqdn}_root":
   include        => ['fastcgi.conf'],
   }
 
-php::fpm::pool{$::fqdn:
+php::fpm::pool{$fqdn:
   user         => $puser,
   group        => $pgroup,
   listen_owner => $puser,
