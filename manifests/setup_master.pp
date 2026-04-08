@@ -117,22 +117,22 @@ file {'/etc/puppetlabs/www/inventory.php':
   require => File['/etc/puppetlabs/www'],
 }
 exec {'fix_inventory_sh':
-  command => "/usr/bin/sed -i 's/XXXZZZXXX/${::fqdn}/g' /etc/puppetlabs/www/inventory.sh",
+  command => "/usr/bin/sed -i 's/XXXZZZXXX/${facts[server_facts][servername]}/g' /etc/puppetlabs/www/inventory.sh",
   cwd     => '/etc/puppetlabs/www',
-  unless  => '/usr/bin/grep ${::fqdn} /etc/puppetlabs/www/inventory.sh',
+  unless  => '/usr/bin/grep $facts[server_facts][servername] /etc/puppetlabs/www/inventory.sh',
   require => File['/etc/puppetlabs/www/inventory.sh'],
   }
 
 include nginx
-nginx::resource::server{ $::fqdn:
+nginx::resource::server{ $server_facts['server_facts']['servername']:
   ensure    => present,
   www_root  => '/etc/puppetlabs/www',
   autoindex => 'on',
   }->
 
-nginx::resource::location { "${::fqdn}_root":
+nginx::resource::location { "${facts[server_facts][servername]}_root":
   ensure         => 'present',
-  server         => $::fqdn,
+  server         => $facts[server_facts][servername],
   www_root       => '/etc/puppetlabs/www',
   location       => '~ \.php$',
   index_files    => ['index.php'],
@@ -141,7 +141,8 @@ nginx::resource::location { "${::fqdn}_root":
   include        => ['fastcgi.conf'],
   }
 
-php::fpm::pool{$::fqdn:
+php::fpm::pool{ $facts[server_facts][servername]:
+  ensure       => 'present',
   user         => $puser,
   group        => $pgroup,
   listen_owner => $puser,
