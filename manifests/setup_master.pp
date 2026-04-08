@@ -9,7 +9,9 @@ $r10k_name = 'puppet',
 $r10k_remote = 'https://github.com/icroseland/demo-control.git',
 $r10k_invalid_branches = 'correct',
 $r10k_basedir = '/etc/puppetlabs/code/environments/',
-$distro = $facts['os']['family']
+$distro = $facts['os']['family'],
+$fqdn = $facts['networking']['fqdn'],
+
 ){
 # setup facts to keep things sane.
 $r10k_configured = { sources => {
@@ -117,22 +119,22 @@ file {'/etc/puppetlabs/www/inventory.php':
   require => File['/etc/puppetlabs/www'],
 }
 exec {'fix_inventory_sh':
-  command => "/usr/bin/sed -i 's/XXXZZZXXX/${facts[server_facts][servername]}/g' /etc/puppetlabs/www/inventory.sh",
+  command => "/usr/bin/sed -i 's/XXXZZZXXX/${fqdn}/g' /etc/puppetlabs/www/inventory.sh",
   cwd     => '/etc/puppetlabs/www',
-  unless  => '/usr/bin/grep $facts[server_facts][servername] /etc/puppetlabs/www/inventory.sh',
+  unless  => '/usr/bin/grep $fqdn /etc/puppetlabs/www/inventory.sh',
   require => File['/etc/puppetlabs/www/inventory.sh'],
   }
 
 include nginx
-nginx::resource::server{ $server_facts['server_facts']['servername']:
+nginx::resource::server{ $fqdn:
   ensure    => present,
   www_root  => '/etc/puppetlabs/www',
   autoindex => 'on',
   }->
 
-nginx::resource::location { "${facts[server_facts][servername]}_root":
+nginx::resource::location { "${fqdn}_root":
   ensure         => 'present',
-  server         => $facts[server_facts][servername],
+  server         => $fqdn,
   www_root       => '/etc/puppetlabs/www',
   location       => '~ \.php$',
   index_files    => ['index.php'],
@@ -141,7 +143,7 @@ nginx::resource::location { "${facts[server_facts][servername]}_root":
   include        => ['fastcgi.conf'],
   }
 
-php::fpm::pool{ $facts[server_facts][servername]:
+php::fpm::pool{ $fqdn:
   ensure       => 'present',
   user         => $puser,
   group        => $pgroup,
