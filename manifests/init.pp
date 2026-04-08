@@ -11,7 +11,7 @@ $r10k_remote = 'https://github.com/icroseland/demo-control.git',
 $r10k_invalid_branches = 'correct',
 $r10k_basedir = '/etc/puppetlabs/code/environments/',
 $distro = $facts['os']['family'],
-$puppetdb_server = = $facts['networking']['fqdn'],
+$puppetdb_server = $facts['networking']['fqdn'],
 $fqdn = $facts['networking']['fqdn'],
 ){
 # setup facts to keep things sane.
