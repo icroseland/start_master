@@ -38,15 +38,15 @@ if $distro == 'Debian' {
   $puser = 'www-data'
   $pgroup = 'www-data' 
 }
-class { '::puppet':
-  server                  => true,
-  agent                   => true,
-  server_foreman          => false,
-  server_reports          => 'store',
-  server_external_nodes   => '',
-  environment             => $environment,
-  autosign                => true,
-  }->
+#class { '::puppet':
+#  server                  => true,
+#  agent                   => true,
+#  server_foreman          => false,
+#  server_reports          => 'store',
+#  server_external_nodes   => '',
+#  environment             => $environment,
+#  autosign                => true,
+#  }->
 file { ['/etc/facter', '/etc/facter/facts.d']:
   ensure => directory
   }->
