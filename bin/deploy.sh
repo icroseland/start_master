@@ -66,12 +66,11 @@ if [ -f /etc/redhat-release ]; then
 
     echo 'quick test'
 
-fi
+elif [ -f /etc/debian_version ]; then
+    DIST_VER=`cat /etc/os-release | grep -E "^NAME=" | grep -o -P '(?<=").*?(?=")'`
 
 ##################### Debians
 
-if [ "$DIST_VER" == "Ubuntu" ]
-then
 apt-get install wget -y
 apt-get install git  -y 
 apt install -y curl wget gnupg2 ca-certificates lsb-release apt-transport-https
