@@ -62,7 +62,8 @@ if [ -f /etc/redhat-release ]; then
     rpm -i https://yum.voxpupuli.org/$GET_FILE
     #disable selinux as its an annoyance for a demo right now.
     ##/usr/sbin/setenforce 0
-
+    dnf -y install openvox-server
+    dnf -y install openvox-agent
     echo 'quick test'
 
 elif [ -f /etc/debian_version ]; then
