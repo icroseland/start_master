@@ -159,7 +159,7 @@ class { '::php::globals':
 class { 'php':
    ensure       => 'present',
    manage_repos => false,
-   fpm          => true,
+   fpm          => false,
    dev          => false,
    composer     => false,
    pear         => true,
