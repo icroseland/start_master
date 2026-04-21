@@ -16,10 +16,12 @@ exec { 'detect_php_version':
   command => "/bin/sh -c 'php -r \"echo PHP_MAJOR_VERSION.\".\".PHP_MINOR_VERSION;\" > /etc/php_version'",
   creates => '/etc/php_version',
   path    => ['/bin','/usr/bin'],
-}~>
-$php_version = file('/etc/php_version')~>
+}
+$php_version = file('/etc/php_version')
+
 class { 'php::globals':
     php_version => $php_version,
+    Require     => Exec['detect_php_version'],
   }
 
   # ---- r10k config structure ----
