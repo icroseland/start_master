@@ -21,7 +21,7 @@ $php_version = file('/etc/php_version')
 
 class { 'php::globals':
     php_version => $php_version,
-    Require     => Exec['detect_php_version'],
+    require     => Exec['detect_php_version'],
   }
 
   # ---- r10k config structure ----
