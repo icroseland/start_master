@@ -4,35 +4,35 @@ class start_master::setup_master(
   $ip                      = $facts['networking']['ip'],
   $environment             = 'production',
   $r10k_name               = 'puppet',
-  $r10k_remote             = 'https://github.com/icroseland/demo-control.git',
+  $r10k_remote             = '[github.com](https://github.com/icroseland/demo-control.git)',
   $r10k_invalid_branches   = 'correct',
   $r10k_basedir            = '/etc/puppetlabs/code/environments/',
   $distro                  = $facts['os']['family'],
   $fqdn                    = $facts['networking']['fqdn'],
 ){
 
+  $php_version = inline_template("<%= `php -r 'echo PHP_MAJOR_VERSION.\".\".PHP_MINOR_VERSION;' 2>/dev/null`.strip %>")
+  $php_sock    = "/run/php/php${php_version}-fpm.sock"
 
-#exec { 'detect_php_version':
-#  command => "php -r 'echo PHP_MAJOR_VERSION.\".\".PHP_MINOR_VERSION;' > /etc/php_version",
-#  creates => '/etc/php_version',
-#  path    => ['/bin','/usr/bin'],
-#}
-#$php_version = file('/etc/php_version')
-$php_version = inline_template("<%= `php -r 'echo PHP_MAJOR_VERSION.\".\".PHP_MINOR_VERSION;' 2>/dev/null`.strip %>")
-
-class { 'php::globals':
-    php_version => $php_version,
-    #require     => Exec['detect_php_version'],
-  }
-
-  # ---- r10k config structure ----
-  $r10k_configured = {
-    'sources' => {
-      $r10k_name => {
-        'remote'           => $r10k_remote,
-        'basedir'          => $r10k_basedir,
-        'invalid_branches' => $r10k_invalid_branches,
+  # ---- OS handling ----
+  case $distro {
+    'RedHat': {
+      $puser = 'nginx'
+      $pgroup = 'nginx'
+      $firewalld_stopped = service { 'firewalld':
+        ensure  => stopped,
+        enable  => false,
       }
+    }
+
+    'Debian': {
+      $puser = 'www-data'
+      $pgroup = 'www-data'
+      $firewalld_stopped = undef
+    }
+
+    default: {
+      fail("Unsupported OS family: ${distro}")
     }
   }
 
@@ -42,35 +42,20 @@ class { 'php::globals':
     group => $group,
   }
 
-  # ---- OS handling ----
-  case $distro {
-    'RedHat': {
-      service { 'firewalld':
-        ensure => stopped,
-        enable => false,
-      }
-
-      $puser = 'nginx'
-      $pgroup = 'nginx'
-    }
-
-    'Debian': {
-      $puser = 'www-data'
-      $pgroup = 'www-data'
-    }
-
-    default: {
-      fail("Unsupported OS family: ${distro}")
-    }
+  # ---- 1. Base packages and PHP globals (EARLIEST) ----
+  -> package { 'git':
+    ensure => present,
+  }
+  -> class { 'php::globals':
+    php_version => $php_version,
   }
 
-  # ---- Puppet Server ----
-  package { 'hiera-eyaml':
+  # ---- 2. Puppet server and hiera-eyaml ----
+  -> package { 'hiera-eyaml':
     ensure   => installed,
     provider => 'puppetserver_gem',
   }
-
-  class { '::puppet':
+  -> class { '::puppet':
     server                => true,
     agent                 => true,
     server_foreman        => false,
@@ -80,112 +65,92 @@ class { 'php::globals':
     autosign              => true,
   }
 
-  file { ['/etc/facter', '/etc/facter/facts.d']:
+  # ---- 3. Custom facts ----
+  -> file { ['/etc/facter', '/etc/facter/facts.d']:
     ensure => directory,
   }
-
-  file { '/etc/facter/facts.d/puppetmaster.txt':
+  -> file { '/etc/facter/facts.d/puppetmaster.txt':
     ensure  => file,
     content => "profile=puppetmaster\npuppet_type=puppetmaster\npuppetenv=production\n",
   }
 
-  # ---- r10k ----
-  exec { 'install_r10k_gem':
+  # ---- 4. r10k installation and configuration ----
+  -> exec { 'install_r10k_gem':
     command => '/opt/puppetlabs/puppet/bin/gem install r10k',
     creates => '/opt/puppetlabs/puppet/bin/r10k',
     path    => ['/bin','/usr/bin','/usr/local/bin'],
   }
-
-  file { '/etc/puppetlabs/r10k':
+  -> file { '/etc/puppetlabs/r10k':
     ensure => directory,
     owner  => 'root',
     group  => 'root',
     mode   => '0755',
   }
-
-  file { '/etc/puppetlabs/r10k/r10k.yaml':
+  -> file { '/etc/puppetlabs/r10k/r10k.yaml':
     ensure  => file,
     content => template('start_master/etc/puppetlabs/r10k/r10k.yaml.erb'),
     owner   => 'root',
     group   => 'root',
   }
-
-  exec { 'deploy environments':
+  -> exec { 'deploy environments':
     command     => '/opt/puppetlabs/puppet/bin/r10k deploy environment -p',
     refreshonly => true,
     subscribe   => File['/etc/puppetlabs/r10k/r10k.yaml'],
   }
-
-  exec { 'chown environments':
+  -> exec { 'chown environments':
     command => 'chown -R puppet:puppet /etc/puppetlabs/code/environments',
     path    => ['/bin','/usr/bin'],
   }
 
-  package { 'git':
-    ensure => present,
-  }
-
-  # ---- eyaml ----
-  file { '/etc/puppetlabs/eyaml':
+  # ---- 5. Eyaml keys ----
+  -> file { '/etc/puppetlabs/eyaml':
     ensure => directory,
     mode   => '0700',
   }
-
-  file { '/etc/puppetlabs/eyaml/keys':
+  -> file { '/etc/puppetlabs/eyaml/keys':
     ensure => directory,
     mode   => '0700',
   }
-
-  file { '/etc/puppetlabs/eyaml/keys/private_key.pkcs7.pem':
+  -> file { ['/etc/puppetlabs/eyaml/keys/private_key.pkcs7.pem',
+             '/etc/puppetlabs/eyaml/keys/public_key.pkcs7.pem']:
     ensure => file,
     mode   => '0400',
   }
-
-  file { '/etc/puppetlabs/eyaml/keys/public_key.pkcs7.pem':
-    ensure => file,
-    mode   => '0444',
+  File <| title == '/etc/puppetlabs/eyaml/keys/public_key.pkcs7.pem' |> {
+    mode => '0444',
   }
 
-  # ---- web content ----
-  file { '/etc/puppetlabs/www':
+  # ---- 6. Web content (before nginx/php) ----
+  -> file { '/etc/puppetlabs/www':
     ensure => directory,
     mode   => '0755',
   }
-
-  file { '/etc/puppetlabs/www/client.php':
+  -> file { '/etc/puppetlabs/www/client.php':
     ensure  => file,
     mode    => '0644',
     content => epp('start_master/etc/puppetlabs/www/client.php.epp'),
   }
-
-  file { '/etc/puppetlabs/www/inventory.sh':
+  -> file { '/etc/puppetlabs/www/inventory.sh':
     ensure => file,
     mode   => '0755',
     source => 'puppet:///modules/start_master/puppetlabs/www/inventory.sh',
   }
-
-  file { '/etc/puppetlabs/www/inventory.php':
+  -> exec { 'fix_inventory_sh':
+    command => "/usr/bin/sed -i 's/XXXZZZXXX/${fqdn}/g' /etc/puppetlabs/www/inventory.sh",
+    unless  => "/usr/bin/grep ${fqdn} /etc/puppetlabs/www/inventory.sh",
+    path    => ['/bin','/usr/bin'],
+  }
+  -> file { '/etc/puppetlabs/www/inventory.php':
     ensure => file,
     mode   => '0644',
     source => 'puppet:///modules/start_master/puppetlabs/www/inventory.php',
   }
 
-  exec { 'fix_inventory_sh':
-    command => "/usr/bin/sed -i 's/XXXZZZXXX/${fqdn}/g' /etc/puppetlabs/www/inventory.sh",
-    unless  => "/usr/bin/grep ${fqdn} /etc/puppetlabs/www/inventory.sh",
-    path    => ['/bin','/usr/bin'],
-    require => File['/etc/puppetlabs/www/inventory.sh'],
-  }
-
-  # ---- PHP / NGINX ----
-
-  $php_sock    = "/run/php/php${php_version}-fpm.sock"
-
-  class { 'nginx':
+  # ---- 7. Nginx + PHP (webserver stack) ----
+  -> class { 'nginx':
     manage_repo => true,
   }
-
-  class { 'php':
+  -> class { 'php':
     ensure       => present,
     manage_repos => false,
     fpm          => true,
@@ -196,26 +161,21 @@ class { 'php::globals':
     fpm_user     => $puser,
     fpm_group    => $pgroup,
   }
-
-  php::fpm::pool { $fqdn:
-    ensure       => present,
-    user         => $puser,
-    group        => $pgroup,
-    listen_owner => $puser,
-    listen_group => $pgroup,
-    listen_mode  => '0660',
-    listen       => $php_sock,
-    require      => Class['php'],
+  -> php::fpm::pool { $fqdn:
+    ensure        => present,
+    user          => $puser,
+    group         => $pgroup,
+    listen_owner  => $puser,
+    listen_group  => $pgroup,
+    listen_mode   => '0660',
+    listen        => $php_sock,
   }
-
-  nginx::resource::server { $fqdn:
-    ensure    => present,
-    www_root  => '/etc/puppetlabs/www',
-    autoindex => 'on',
-    require   => Class['nginx'],
+  -> nginx::resource::server { $fqdn:
+    ensure     => present,
+    www_root   => '/etc/puppetlabs/www',
+    autoindex  => 'on',
   }
-
-  nginx::resource::location { "${fqdn}_php":
+  -> nginx::resource::location { "${fqdn}_php":
     ensure      => present,
     server      => $fqdn,
     location    => '~ \.php$',
@@ -223,15 +183,18 @@ class { 'php::globals':
     index_files => ['index.php'],
     fastcgi     => "unix:${php_sock}",
     include     => ['fastcgi.conf'],
-    require     => Php::Fpm::Pool[$fqdn],
   }
 
-  # ---- misc ----
-  file { '/home/inventory_data':
+  # ---- 8. Final cleanup ----
+  -> file { '/home/inventory_data':
     ensure => directory,
     owner  => $puser,
     group  => $pgroup,
     mode   => '0755',
   }
 
+  # ---- OS-specific services ----
+  if $firewalld_stopped {
+    Package['git'] -> $firewalld_stopped
+  }
 }
