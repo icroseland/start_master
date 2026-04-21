@@ -13,7 +13,7 @@ class start_master::setup_master(
 
 
 exec { 'detect_php_version':
-  command => "/bin/sh -c 'php -r 'echo PHP_MAJOR_VERSION.".".PHP_MINOR_VERSION;'\" > /etc/php_version'",
+  command => "php -r 'echo PHP_MAJOR_VERSION.\".\".PHP_MINOR_VERSION;' > /etc/php_version",
   creates => '/etc/php_version',
   path    => ['/bin','/usr/bin'],
 }
