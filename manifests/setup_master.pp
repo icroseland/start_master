@@ -38,6 +38,11 @@ if $distro == 'Debian' {
   $puser = 'www-data'
   $pgroup = 'www-data'
 }
+
+package { 'hiera-eyaml':
+ensure   => 'installed',
+provider => 'puppetserver_gem',
+}
 class { '::puppet':
   server                  => true,
   agent                   => true,
@@ -143,15 +148,15 @@ nginx::resource::location { "${fqdn}_root":
   include        => ['fastcgi.conf'],
   }
 
-#php::fpm::pool{ $fqdn:
-#  ensure       => 'present',
-#  user         => $puser,
-#  group        => $pgroup,
-#  listen_owner => $puser,
-#  listen_group => $pgroup,
-#  listen_mode  => '0660',
-#  listen       => '/run/php/php7.0-fpm.sock',
-#  }
+php::fpm::pool{ $fqdn:
+  ensure       => 'present',
+  user         => $puser,
+  group        => $pgroup,
+  listen_owner => $puser,
+  listen_group => $pgroup,
+  listen_mode  => '0660',
+  listen       => '/run/php/php7.0-fpm.sock',
+  }
 
 class { '::php::globals':
   php_version => '7.0'
