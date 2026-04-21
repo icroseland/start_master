@@ -9,6 +9,7 @@ class start_master::webstack(
   $proxy                = undef,
   $www_root             = "${full_web_path}/${name}/",
   $location_cfg_append  = undef,
+  $name                 = "${facts['networking']['hostname']}",
 ) {
 
   # ---- FIREWALL (RedHat only) ----
@@ -19,11 +20,11 @@ class start_master::webstack(
     }
   }
 
-  nginx::resource::server { "${name}.${facts['networking']['domain']}":
+  nginx::resource::server { $fqdn":
     ensure              => present,
-    www_root            => "${full_web_path}/${name}/",
+    www_root            => "${full_web_path}/${fqdn}/",
     location_cfg_append => {
-      'rewrite' => '^ https://$server_name$request_uri? permanent'
+      'rewrite' => '^ https://$fqdn$request_uri? permanent'
     }‚,
   }
 
@@ -33,7 +34,7 @@ class start_master::webstack(
     $tmp_www_root = $www_root
   }
 
-  nginx::resource::server { "${name}.${facts['networking']['domain']} ${name}":
+  nginx::resource::server { "${fqdn} ${name}":
     ensure                => present,
     listen_port           => 443,
     www_root              => $tmp_www_root,
@@ -51,7 +52,7 @@ class start_master::webstack(
       ensure          => present,
       ssl             => true,
       ssl_only        => true,
-      server           => "${name}.${facts['networking']['domain']} ${name}",
+      server           => "${fqdn} ${name}",
       www_root        => "${full_web_path}/${name}/",
       location        => '~ \.php$',
       index_files     => ['index.php', 'index.html', 'index.htm'],
