@@ -3,6 +3,12 @@ class start_master::webstack(
   $puser,
   $pgroup,
   $fqdn,
+  $full_web_path        = '/var/www',
+  $backend_port         = 9000,
+  $php                  = true,
+  $proxy                = undef,
+  $www_root             = "${full_web_path}/${name}/",
+  $location_cfg_append  = undef,
 ) {
 
   # ---- FIREWALL (RedHat only) ----
@@ -13,50 +19,50 @@ class start_master::webstack(
     }
   }
 
-  # ---- NGINX: completely standalone ----
-  class { 'nginx':
-    manage_repo => true,
+  nginx::resource::server { "${name}.${facts['networking']['domain']}":
+    ensure              => present,
+    www_root            => "${full_web_path}/${name}/",
+    location_cfg_append => {
+      'rewrite' => '^ https://$server_name$request_uri? permanent'
+    }‚
   }
 
-  # ---- PHP: completely standalone ----
-  class { 'php':
-    ensure       => present,
-    manage_repos => false,
-    fpm          => true,
-    dev          => false,
-    composer     => false,
-    pear         => true,
-    phpunit      => false,
-    fpm_user     => $puser,
-    fpm_group    => $pgroup,
+  if !$www_root {
+    $tmp_www_root = undef
+  } else {
+    $tmp_www_root = $www_root
   }
 
-  # ---- /run/php: standalone, only anchored inside php internals ----
-  file { '/run/php':
-    ensure  => directory,
-    owner   => $puser,
-    group   => $pgroup,
-    mode    => '0755',
-    require => Class['php::packages'],
-    before  => Class['php::fpm::service'],
+  nginx::resource::server { "${name}.${facts['networking']['domain']} ${name}":
+    ensure                => present,
+    listen_port           => 443,
+    www_root              => $tmp_www_root,
+    proxy                 => $proxy,
+    location_cfg_append   => $location_cfg_append,
+    index_files           => [ 'index.php' ],
+    ssl                   => true,
+    ssl_cert              => '/path/to/wildcard_mydomain.crt',
+    ssl_key               => '/path/to/wildcard_mydomain.key',
   }
 
-  # ---- NGINX RESOURCES: require both classes but no -> chaining ----
-  nginx::resource::server { $fqdn:
-    ensure    => present,
-    www_root  => '/etc/puppetlabs/www',
-    autoindex => 'on',
-    require   => [ Class['nginx'], Class['php'] ],
-  }
 
-  nginx::resource::location { "${fqdn}_php":
-    ensure      => present,
-    server      => $fqdn,
-    location    => '~ \.php$',
-    www_root    => '/etc/puppetlabs/www',
-    index_files => ['index.php'],
-    fastcgi     => "unix:${php_sock}",
-    include     => ['fastcgi.conf'],
-    require     => Nginx::Resource::Server[$fqdn],
+  if $php {
+    nginx::resource::location { "${name}_root":
+      ensure          => present,
+      ssl             => true,
+      ssl_only        => true,
+      server           => "${name}.${facts['networking']['domain']} ${name}",
+      www_root        => "${full_web_path}/${name}/",
+      location        => '~ \.php$',
+      index_files     => ['index.php', 'index.html', 'index.htm'],
+      proxy           => undef,
+      fastcgi         => "127.0.0.1:${backend_port}",
+      fastcgi_script  => undef,
+      location_cfg_append => {
+        fastcgi_connect_timeout => '3m',
+        fastcgi_read_timeout    => '3m',
+        fastcgi_send_timeout    => '3m'
+      }
+    }
   }
 }
