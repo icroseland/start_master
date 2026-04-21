@@ -18,7 +18,7 @@ class start_master::webstack(
   }
 
   # PHP CLASS (handles its own FPM service) 
-  Class['nginx'] ->
+  ##Class['nginx'] ->
   class { 'php':
     ensure       => present,
     manage_repos => false,
@@ -32,7 +32,7 @@ class start_master::webstack(
   }
 
   # NGINX RESOURCES AFTER BOTH CLASSES
-  Class['php'] ->
+  ##Class['php'] ->
   nginx::resource::server { $fqdn:
     ensure    => present,
     www_root  => '/etc/puppetlabs/www',
