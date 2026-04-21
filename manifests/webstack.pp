@@ -13,22 +13,12 @@ class start_master::webstack(
     }
   }
 
-  # ---- CREATE /run/php BEFORE php-fpm starts ----
-  file { '/run/php':
-    ensure => directory,
-    owner  => $puser,
-    group  => $pgroup,
-    mode   => '0755',
-  }
-
-  # ---- NGINX CLASS ----
+  # ---- NGINX: completely standalone ----
   class { 'nginx':
     manage_repo => true,
   }
 
-  # ---- PHP CLASS (after nginx and /run/php exist) ----
-  Class['nginx'] ->
-  File['/run/php'] ->
+  # ---- PHP: completely standalone ----
   class { 'php':
     ensure       => present,
     manage_repos => false,
@@ -41,13 +31,24 @@ class start_master::webstack(
     fpm_group    => $pgroup,
   }
 
-  # ---- NGINX RESOURCES (after php class completes) ----
-  Class['php'] ->
+  # ---- /run/php: standalone, only anchored inside php internals ----
+  file { '/run/php':
+    ensure  => directory,
+    owner   => $puser,
+    group   => $pgroup,
+    mode    => '0755',
+    require => Class['php::packages'],
+    before  => Class['php::fpm::service'],
+  }
+
+  # ---- NGINX RESOURCES: require both classes but no -> chaining ----
   nginx::resource::server { $fqdn:
     ensure    => present,
     www_root  => '/etc/puppetlabs/www',
     autoindex => 'on',
-  } ->
+    require   => [ Class['nginx'], Class['php'] ],
+  }
+
   nginx::resource::location { "${fqdn}_php":
     ensure      => present,
     server      => $fqdn,
@@ -56,5 +57,6 @@ class start_master::webstack(
     index_files => ['index.php'],
     fastcgi     => "unix:${php_sock}",
     include     => ['fastcgi.conf'],
+    require     => Nginx::Resource::Server[$fqdn],
   }
 }
