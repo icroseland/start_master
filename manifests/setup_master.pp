@@ -81,11 +81,11 @@ class start_master::setup_master(
     }
 
     # STEP 1: Nginx ONLY (no php yet)
-    contain 'nginx'
+   ## contain 'nginx'
 
     # STEP 2: PHP packages/service
     Class['nginx'] ->
-    contain 'php'
+   ## contain 'php'
 
     # STEP 3: PHP FPM pool (after php class)
     Class['php'] ->
