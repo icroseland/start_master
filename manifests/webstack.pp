@@ -4,7 +4,7 @@ class start_master::webstack(
   $pgroup,
   $fqdn,
 ) {
-  # 1. FIREWALL (RedHat)
+  # FIREWALL FIRST
   if $facts['os']['family'] == 'RedHat' {
     service { 'firewalld':
       ensure => stopped,
@@ -12,12 +12,12 @@ class start_master::webstack(
     }
   }
 
-  # 2. NGINX FIRST
+  # NGINX CLASS (handles its own service)
   class { 'nginx':
     manage_repo => true,
   }
 
-  # 3. PHP SECOND
+  # PHP CLASS (handles its own FPM service) 
   Class['nginx'] ->
   class { 'php':
     ensure       => present,
@@ -31,13 +31,8 @@ class start_master::webstack(
     fpm_group    => $pgroup,
   }
 
-  # 4. SERVICES BEFORE CONFIGS
+  # NGINX RESOURCES AFTER BOTH CLASSES
   Class['php'] ->
-  Service['nginx'] ->
-  Service['php-fpm']
-
-  # 5. NGINX CONFIGS LAST
-  Service['php-fpm'] ->
   nginx::resource::server { $fqdn:
     ensure    => present,
     www_root  => '/etc/puppetlabs/www',
