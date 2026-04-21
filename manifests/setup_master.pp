@@ -12,12 +12,13 @@ class start_master::setup_master(
 ){
 
 
-exec { 'detect_php_version':
-  command => "php -r 'echo PHP_MAJOR_VERSION.\".\".PHP_MINOR_VERSION;' > /etc/php_version",
-  creates => '/etc/php_version',
-  path    => ['/bin','/usr/bin'],
-}
-$php_version = file('/etc/php_version')
+#exec { 'detect_php_version':
+#  command => "php -r 'echo PHP_MAJOR_VERSION.\".\".PHP_MINOR_VERSION;' > /etc/php_version",
+#  creates => '/etc/php_version',
+#  path    => ['/bin','/usr/bin'],
+#}
+#$php_version = file('/etc/php_version')
+$php_version = inline_template("<%= `php -r 'echo PHP_MAJOR_VERSION.\".\".PHP_MINOR_VERSION;' 2>/dev/null`.strip %>")
 
 class { 'php::globals':
     php_version => $php_version,
