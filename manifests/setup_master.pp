@@ -70,8 +70,8 @@ class start_master::setup_master(
   # ---- WEBSTACK (separate class) ----
   class { 'start_master::webstack':
     php_sock => $php_sock,
-    user     => $puser,
-    group    => $pgroup,
+    puser    => $puser,
+    pgroup   => $pgroup,
     fqdn     => $fqdn,
   }
 
