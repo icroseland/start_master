@@ -20,7 +20,7 @@ class start_master::webstack(
     }
   }
 
-  nginx::resource::server { $fqdn":
+  nginx::resource::server { $fqdn:
     ensure              => present,
     www_root            => "${full_web_path}/${fqdn}/",
     location_cfg_append => {
