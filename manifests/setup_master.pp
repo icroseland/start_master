@@ -71,7 +71,7 @@ class start_master::setup_master(
   class { 'start_master::webstack':
     php_sock => $php_sock,
     user     => $puser,
-        => $pgroup,
+    group    => $pgroup,
     fqdn     => $fqdn,
   }
 
