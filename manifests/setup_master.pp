@@ -37,15 +37,16 @@ class start_master::setup_master(
     group => $group,
   }
 
-  # ---- 1. Base packages and PHP globals ----
+  # ---- PHASE 1: Base packages ----
   package { 'git':
     ensure => present,
   } ->
   class { 'php::globals':
     php_version => $php_version,
-  } ->
+  }
 
-  # ---- 2. Puppet server ----
+  # ---- PHASE 2: Puppet server ----
+  Package['git'] ->
   package { 'hiera-eyaml':
     ensure   => installed,
     provider => 'puppetserver_gem',
@@ -58,21 +59,20 @@ class start_master::setup_master(
     server_external_nodes => '',
     environment           => $environment,
     autosign              => true,
-  } ->
+  }
 
-  # ---- 3. Custom facts ----
-  file { '/etc/facter':
-    ensure => directory,
-  } ->
-  file { '/etc/facter/facts.d':
+  # ---- PHASE 3: Custom facts ----
+  Class['::puppet'] ->
+  file { ['/etc/facter', '/etc/facter/facts.d']:
     ensure => directory,
   } ->
   file { '/etc/facter/facts.d/puppetmaster.txt':
     ensure  => file,
     content => "profile=puppetmaster\npuppet_type=puppetmaster\npuppetenv=production\n",
-  } ->
+  }
 
-  # ---- 4. r10k installation and configuration ----
+  # ---- PHASE 4: r10k ----
+  File['/etc/facter/facts.d/puppetmaster.txt'] ->
   exec { 'install_r10k_gem':
     command => '/opt/puppetlabs/puppet/bin/gem install r10k',
     creates => '/opt/puppetlabs/puppet/bin/r10k',
@@ -97,9 +97,10 @@ class start_master::setup_master(
   exec { 'chown environments':
     command => 'chown -R puppet:puppet /etc/puppetlabs/code/environments',
     path    => ['/bin','/usr/bin'],
-  } ->
+  }
 
-  # ---- 5. Eyaml keys ----
+  # ---- PHASE 5: Eyaml keys ----
+  Exec['chown environments'] ->
   file { '/etc/puppetlabs/eyaml':
     ensure => directory,
     mode   => '0700',
@@ -115,9 +116,10 @@ class start_master::setup_master(
   file { '/etc/puppetlabs/eyaml/keys/public_key.pkcs7.pem':
     ensure => file,
     mode   => '0444',
-  } ->
+  }
 
-  # ---- 6. Web content ----
+  # ---- PHASE 6: Web content (BEFORE webserver) ----
+  File['/etc/puppetlabs/eyaml/keys/public_key.pkcs7.pem'] ->
   file { '/etc/puppetlabs/www':
     ensure => directory,
     mode   => '0755',
@@ -141,12 +143,22 @@ class start_master::setup_master(
     ensure => file,
     mode   => '0644',
     source => 'puppet:///modules/start_master/puppetlabs/www/inventory.php',
-  } ->
+  }
 
-  # ---- 7. Web server stack ----
+  # ---- PHASE 7: WEBSTACK - STRICT ORDERING ----
+  File['/etc/puppetlabs/www/inventory.php'] ->
+  # Firewalld FIRST (RedHat only)
+  service { 'firewalld':
+    ensure => stopped,
+    enable => false,
+  } ->
+  
+  # Nginx package/service first
   class { 'nginx':
     manage_repo => true,
   } ->
+
+  # PHP packages first  
   class { 'php':
     ensure       => present,
     manage_repos => false,
@@ -158,20 +170,28 @@ class start_master::setup_master(
     fpm_user     => $puser,
     fpm_group    => $pgroup,
   } ->
+
+  # PHP FPM pool config (depends on PHP class)
   php::fpm::pool { $fqdn:
     ensure        => present,
     user          => $puser,
-    group         => $pgroup,
+    group         => $puser,
     listen_owner  => $puser,
     listen_group  => $pgroup,
     listen_mode   => '0660',
     listen        => $php_sock,
+    require       => Class['php'],
   } ->
+
+  # Nginx server block (depends on PHP pool)
   nginx::resource::server { $fqdn:
     ensure     => present,
     www_root   => '/etc/puppetlabs/www',
     autoindex  => 'on',
+    require    => Php::Fpm::Pool[$fqdn],
   } ->
+
+  # Nginx PHP location (depends on server block)
   nginx::resource::location { "${fqdn}_php":
     ensure      => present,
     server      => $fqdn,
@@ -180,22 +200,15 @@ class start_master::setup_master(
     index_files => ['index.php'],
     fastcgi     => "unix:${php_sock}",
     include     => ['fastcgi.conf'],
-  } ->
+    require     => Nginx::Resource::Server[$fqdn],
+  }
 
-  # ---- 8. Final cleanup ----
+  # ---- PHASE 8: Final cleanup ----
+  Nginx::Resource::Location["${fqdn}_php"] ->
   file { '/home/inventory_data':
     ensure => directory,
     owner  => $puser,
     group  => $pgroup,
     mode   => '0755',
-  }
-
-  # ---- OS-specific: Firewalld (RedHat only) ----
-  if $distro == 'RedHat' {
-    service { 'firewalld':
-      ensure  => stopped,
-      enable  => false,
-      before  => Class['nginx'],
-    }
   }
 }
