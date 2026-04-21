@@ -22,7 +22,7 @@ $php_version = inline_template("<%= `php -r 'echo PHP_MAJOR_VERSION.\".\".PHP_MI
 
 class { 'php::globals':
     php_version => $php_version,
-    require     => Exec['detect_php_version'],
+    #require     => Exec['detect_php_version'],
   }
 
   # ---- r10k config structure ----
