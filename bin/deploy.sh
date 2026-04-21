@@ -44,6 +44,7 @@ if [ -f /etc/redhat-release ]; then
     dnf install git -y
     dnf install unzip -y
     dnf install curl -y
+    dnf install php -y
 
     LSB=$(
         if [ -f /etc/os-release ]; then
@@ -81,6 +82,8 @@ elif [ -f /etc/debian_version ]; then
 
 apt-get install wget -y
 apt-get install git  -y 
+apt-get install php -y
+
 apt install -y curl wget gnupg2 ca-certificates lsb-release apt-transport-https
 U_VER=`lsb_release -a | grep Codename | awk '{split($0,a,":"); print a[2]}' | sed -e 's/^[ \t]*//'`
 wget "https://apt.puppet.com/puppet7-release-$U_VER.deb"

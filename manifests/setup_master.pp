@@ -11,6 +11,17 @@ class start_master::setup_master(
   $fqdn                    = $facts['networking']['fqdn'],
 ){
 
+
+exec { 'detect_php_version':
+  command => "/bin/sh -c 'php -r \"echo PHP_MAJOR_VERSION.\".\".PHP_MINOR_VERSION;\" > /etc/php_version'",
+  creates => '/etc/php_version',
+  path    => ['/bin','/usr/bin'],
+}~>
+$php_version = file('/etc/php_version')~>
+class { 'php::globals':
+    php_version => $php_version,
+  }
+
   # ---- r10k config structure ----
   $r10k_configured = {
     'sources' => {
@@ -164,15 +175,11 @@ class start_master::setup_master(
   }
 
   # ---- PHP / NGINX ----
-  $php_version = '8.2'
+
   $php_sock    = "/run/php/php${php_version}-fpm.sock"
 
   class { 'nginx':
     manage_repo => true,
-  }
-
-  class { 'php::globals':
-    php_version => $php_version,
   }
 
   class { 'php':
