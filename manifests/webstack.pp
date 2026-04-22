@@ -48,7 +48,6 @@ class start_master::webstack(
     ssl                   => true,
     ssl_cert              => '/path/to/wildcard_mydomain.crt',
     ssl_key               => '/path/to/wildcard_mydomain.key',
-    proxy                 => undef,
     }
 
 
