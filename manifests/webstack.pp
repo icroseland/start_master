@@ -7,9 +7,9 @@ class start_master::webstack(
   $backend_port         = 9000,
   $php                  = true,
   $proxy                = undef,
-  $www_root             = "${full_web_path}/${name}/",
   $location_cfg_append  = undef,
   $hostname             = "${facts['networking']['hostname']}",
+  $www_root             = "${full_web_path}/${hostname}/",
 ) {
 
   # ---- FIREWALL (RedHat only) ----
