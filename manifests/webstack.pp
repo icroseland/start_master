@@ -29,6 +29,7 @@ class start_master::webstack(
     proxy_read_timeout    => '3m',
     proxy_connect_timeout => '3m',
     proxy_send_timeout    => '3m',
+    proxy                 => undef,
 }
 
   if !$www_root {
@@ -47,6 +48,7 @@ class start_master::webstack(
     ssl                   => true,
     ssl_cert              => '/path/to/wildcard_mydomain.crt',
     ssl_key               => '/path/to/wildcard_mydomain.key',
+    proxy                 => undef,
     }
 
 
