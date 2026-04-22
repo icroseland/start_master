@@ -21,12 +21,15 @@ class start_master::webstack(
   }
 
   nginx::resource::server { $fqdn:
-    ensure              => present,
-    www_root            => "${full_web_path}/${fqdn}/",
-    location_cfg_append => { rewrite => "^ [${fqdn}](https://${fqdn}\$request_uri) permanent" },
-    spdy                => 'off',
-    http2               => 'off',
-  }
+    ensure                => present,
+    www_root              => "${full_web_path}/${fqdn}/",
+    location_cfg_append   => { rewrite => "^ [${fqdn}](https://${fqdn}\$request_uri) permanent" },
+    spdy                  => 'off',
+    http2                 => 'off',
+    proxy_read_timeout    => '3m',
+    proxy_connect_timeout => '3m',
+    proxy_send_timeout    => '3m',
+    }
 
   if !$www_root {
     $tmp_www_root = undef
