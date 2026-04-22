@@ -29,6 +29,12 @@ class start_master::webstack(
     proxy_read_timeout    => '3m',
     proxy_connect_timeout => '3m',
     proxy_send_timeout    => '3m',
+    proxy_set_header      => {
+      Host              => undef,
+      X-Real-IP         => undef,
+      X-Forwarded-For   => undef,
+      X-Forwarded-Proto => undef,
+      },
     }
 
   if !$www_root {
