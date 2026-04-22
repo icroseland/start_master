@@ -45,8 +45,8 @@ class start_master::webstack(
     location_cfg_append   => $location_cfg_append,
     index_files           => [ 'index.php' ],
     ssl                   => true,
-    ssl_cert              => '/path/to/wildcard_mydomain.crt',
-    ssl_key               => '/path/to/wildcard_mydomain.key',
+    ssl_cert              => '/etc/ssl/nginx-selfsigned.crt',
+    ssl_key               => '/etc/ssl/nginx-selfsigned.key',
     }
 
 
