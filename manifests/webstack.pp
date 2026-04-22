@@ -11,7 +11,7 @@ class start_master::webstack(
   $hostname             = "${facts['networking']['hostname']}",
   $www_root             = "${full_web_path}/${hostname}/",
 ) {
-
+  include nginx
   # ---- FIREWALL (RedHat only) ----
   if $facts['os']['family'] == 'RedHat' {
     service { 'firewalld':
@@ -29,7 +29,6 @@ class start_master::webstack(
     proxy_read_timeout    => '3m',
     proxy_connect_timeout => '3m',
     proxy_send_timeout    => '3m',
-    proxy                 => undef,
 }
 
   if !$www_root {
