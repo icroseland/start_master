@@ -9,7 +9,7 @@ class start_master::webstack(
   $proxy                = undef,
   $www_root             = "${full_web_path}/${name}/",
   $location_cfg_append  = undef,
-  $name                 = "${facts['networking']['hostname']}",
+  $hostname             = "${facts['networking']['hostname']}",
 ) {
 
   # ---- FIREWALL (RedHat only) ----
@@ -33,7 +33,7 @@ class start_master::webstack(
     $tmp_www_root = $www_root
   }
 
-  nginx::resource::server { "${fqdn} ${name}":
+  nginx::resource::server { "${fqdn} ${hostname}":
     ensure                => present,
     listen_port           => 443,
     www_root              => $tmp_www_root,
@@ -47,12 +47,12 @@ class start_master::webstack(
 
 
   if $php {
-    nginx::resource::location { "${name}_root":
+    nginx::resource::location { "${hostname}_root":
       ensure          => present,
       ssl             => true,
       ssl_only        => true,
-      server           => "${fqdn} ${name}",
-      www_root        => "${full_web_path}/${name}/",
+      server          => "${fqdn} ${hostname}",
+      www_root        => "${full_web_path}/${hostname}",
       location        => '~ \.php$',
       index_files     => ['index.php', 'index.html', 'index.htm'],
       proxy           => undef,
