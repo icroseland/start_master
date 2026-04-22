@@ -25,7 +25,7 @@ class start_master::webstack(
     www_root            => "${full_web_path}/${fqdn}/",
     location_cfg_append => { rewrite => "^ [${fqdn}](https://${fqdn}\$request_uri) permanent" },
     spdy                => 'off',
-
+    http2               => 'off',
   }
 
   if !$www_root {
