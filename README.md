@@ -29,3 +29,4 @@ This is only kind of a module, as it is meant to be run on a host that currently
 *  from here curl will grab and execute the client install from the puppetmaster and do the initial puppet run against the host.
 
 
+
