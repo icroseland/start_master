@@ -1,6 +1,7 @@
 # @manage the installed master, and setup the puppetdb
 # We now can expect hiera to config things.. There are some vaugly sane defaults.
-
+#
+#
 class start_master(
 $user = 'puppet',
 $group = 'puppet',
@@ -15,14 +16,16 @@ $puppetdb_server = $facts['networking']['fqdn'],
 $fqdn = $facts['networking']['fqdn'],
 ){
 # setup facts to keep things sane.
-$r10k_configured = { sources => {
-                      $r10k_name  => {
-                        remote => $r10k_remote,
-                        basedir => $r10k_basedir,
-                        invalid_branches => $r10k_invalid_branches
-                        }
-                    }
-} 
+  $r10k_configured = {
+    sources => {
+      $r10k_name => {
+        remote => $r10k_remote,
+        basedir => $r10k_basedir,
+        invalid_branches => $r10k_invalid_branches
+      }
+    }
+    }
+
 
 File {
   owner => $user,
@@ -33,34 +36,35 @@ if $distro == 'RedHat' {
     ensure => stopped,
   }
   $puser = 'nginx'
-  $pgroup = 'nginx' 
+  $pgroup = 'nginx'
 }
 if $distro == 'Debian' {
   $puser = 'www-data'
-  $pgroup = 'www-data' 
+  $pgroup = 'www-data'
 }
 if $puppetdb_server == $fqdn {
   class { 'start_master::db_setup': }
-}->
-class { '::puppet':
-  server                  => true,
-  agent                   => true,
-  server_foreman          => false,
-  server_reports          => 'puppetdb',
-  server_storeconfigs     => true,
-  server_external_nodes   => '',
-  environment             => $environment,
-  autosign                => true,
-  }->
-class { 'puppet::server::puppetdb':
+}
+-> class { '::puppet':
+  server                => true,
+  agent                 => true,
+  server_foreman        => false,
+  server_reports        => 'puppetdb',
+  server_storeconfigs   => true,
+  server_external_nodes => '',
+  environment           => $environment,
+  autosign              => true,
+  }
+-> class { 'puppet::server::puppetdb':
   server => $puppetdb_server
-  }->
-notify { 'Setting up r10k and puppet environments':}->
-exec { 'chown environments':
+  }
+
+-> notify { 'Setting up r10k and puppet environments':}
+-> exec { 'chown environments':
   command => 'chown -R puppet: /etc/puppetlabs/code/environments',
   path    => '/bin:/usr/bin:/usr/local/bin'
   }
-file { '/etc/puppetlabs/r10k': 
+file { '/etc/puppetlabs/r10k':
   ensure => directory,
   owner  => 'root',
   group  => 'root',
@@ -78,17 +82,17 @@ package {'git':
 #ensure eyaml is working.
 file {'/etc/puppetlabs/eyaml':
   mode => '0400',
-}->
-file {'/etc/puppetlabs/eyaml/keys':
+}
+-> file {'/etc/puppetlabs/eyaml/keys':
   mode => '0400',
-}->
-file {'/etc/puppetlabs/eyaml/keys/private_key.pkcs7.pem':
+}
+-> file {'/etc/puppetlabs/eyaml/keys/private_key.pkcs7.pem':
   mode => '0400',
-}->
-file {'/etc/puppetlabs/eyaml/keys/public_key.pkcs7.pem':
+}
+-> file {'/etc/puppetlabs/eyaml/keys/public_key.pkcs7.pem':
   mode => '0400',
-}->
-exec { 'deploy environments':
+}
+-> exec { 'deploy environments':
   command => '/opt/puppetlabs/puppet/bin/r10k deploy environment -p',
   require => Exec['install_r10k_gem'],
   }
@@ -107,9 +111,9 @@ nginx::resource::server{ $fqdn:
   ensure    => present,
   www_root  => '/etc/puppetlabs/www',
   autoindex => 'on',
-  }->
+  }
 
-nginx::resource::location { "${fqdn}_root":
+-> nginx::resource::location { "${fqdn}_root":
   ensure         => 'present',
   server         => $fqdn,
   www_root       => '/etc/puppetlabs/www',
@@ -131,29 +135,29 @@ php::fpm::pool{$fqdn:
 
 class { '::php::globals':
   php_version => '7.0'
-}->
-class { 'php':
-   ensure       => 'present',
-   manage_repos => false,
-   fpm          => true,
-   dev          => false,
-   composer     => false,
-   pear         => true,
-   phpunit      => false,
-   fpm_user     => $puser,
-   fpm_group    => $pgroup,
-}->
+}
+-> class { 'php':
+  ensure       => 'present',
+  manage_repos => false,
+  fpm          => true,
+  dev          => false,
+  composer     => false,
+  pear         => true,
+  phpunit      => false,
+  fpm_user     => $puser,
+  fpm_group    => $pgroup,
+}
 
-group { 'http':
+-> group { 'http':
   ensure => present
-}->
-user { 'http':
+}
+-> user { 'http':
   ensure  => present,
   comment => 'make php work',
   shell   => '/sbin/nologin',
   gid     => 'http',
-}->
-file { "/home/inventory_data":
+}
+-> file { '/home/inventory_data':
   ensure => 'directory',
   owner  => $puser,
   group  => $pgroup,

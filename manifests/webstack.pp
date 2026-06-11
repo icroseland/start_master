@@ -1,3 +1,5 @@
+#
+#
 class start_master::webstack(
   $php_sock,
   $puser,
@@ -8,7 +10,7 @@ class start_master::webstack(
   $php                  = true,
   $proxy                = undef,
   $location_cfg_append  = undef,
-  $hostname             = "${facts['networking']['hostname']}",
+  $hostname             = $facts['networking']['hostname'],
   $www_root             = "${full_web_path}/${hostname}/",
 ) {
   include nginx
@@ -38,30 +40,30 @@ class start_master::webstack(
   }
 
   nginx::resource::server { "${fqdn} ${hostname}":
-    ensure                => present,
-    listen_port           => 443,
-    www_root              => $tmp_www_root,
-    proxy                 => $proxy,
-    location_cfg_append   => $location_cfg_append,
-    index_files           => [ 'index.php' ],
-    ssl                   => true,
-    ssl_cert              => '/etc/ssl/nginx-selfsigned.crt',
-    ssl_key               => '/etc/ssl/nginx-selfsigned.key',
+    ensure              => present,
+    listen_port         => 443,
+    www_root            => $tmp_www_root,
+    proxy               => $proxy,
+    location_cfg_append => $location_cfg_append,
+    index_files         => [ 'index.php' ],
+    ssl                 => true,
+    ssl_cert            => '/etc/ssl/nginx-selfsigned.crt',
+    ssl_key             => '/etc/ssl/nginx-selfsigned.key',
     }
 
 
   if $php {
     nginx::resource::location { "${hostname}_root":
-      ensure          => present,
-      ssl             => true,
-      ssl_only        => true,
-      server          => "${fqdn} ${hostname}",
-      www_root        => "${full_web_path}/${hostname}",
-      location        => '~ \.php$',
-      index_files     => ['index.php', 'index.html', 'index.htm'],
-      proxy           => undef,
-      fastcgi         => "127.0.0.1:${backend_port}",
-      fastcgi_script  => undef,
+      ensure         => present,
+      ssl            => true,
+      ssl_only       => true,
+      server         => "${fqdn} ${hostname}",
+      www_root       => "${full_web_path}/${hostname}",
+      location       => '~ \.php$',
+      index_files    => ['index.php', 'index.html', 'index.htm'],
+      proxy          => undef,
+      fastcgi        => "127.0.0.1:${backend_port}",
+      fastcgi_script => undef,
       location_cfg_append => {
         fastcgi_connect_timeout => '3m',
         fastcgi_read_timeout    => '3m',
