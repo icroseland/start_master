@@ -32,7 +32,7 @@ if [ -f /etc/redhat-release ]; then
 
     DIST_VER=`cat /etc/[A-Za-z]*[_-][rv]e[lr]* | grep -E "^NAME=" | grep -o -P '(?<=").*?(?=")'`
     case "$DIST_VER" in
-        "CentOS Linux"|"AlmaLinux"|"Oracle Linux"|"Rocky Linux")
+        "CentOS Linux"|"CentOS Stream"|"AlmaLinux"|"Oracle Linux"|"Rocky Linux")
             SN='el'
             ;;  
         "Fedora Linux")
