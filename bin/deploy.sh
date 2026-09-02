@@ -58,7 +58,7 @@ if [ -f /etc/redhat-release ]; then
     )
 
     echo "LSB eq $DIST_VER  $LSB"
-    GET_FILE=`curl -k -s https://yum.voxpupuli.org/ | grep -oP '(?<=href=")[^"]+' | grep -v '^/' | grep "$SN-$LSB" | sort -r | head -n 1`
+    GET_FILE=`curl -k -s https://yum.voxpupuli.org/ | grep -oP '(?<=href=")[^"]+' | grep -v '^/' | grep openvox | grep "$SN-$LSB" | sort -r | head -n 1`
     echo "rpm -Uvh https://yum.voxpupuli.org/$GET_FILE"
     rpm -Uvh  "https://yum.voxpupuli.org/$GET_FILE" &&
     #disable selinux as its an annoyance for a demo right now.
