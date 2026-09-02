@@ -40,7 +40,8 @@ if [ -f /etc/redhat-release ]; then
             SN='fedora'
             ;;
     esac
-
+    echo $SN
+    
     dnf install wget -y
     dnf install git -y
     dnf install unzip -y
