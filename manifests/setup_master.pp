@@ -13,7 +13,8 @@ class start_master::setup_master(
   $fqdn                    = $facts['networking']['fqdn'],
 ){
 
-  $php_version = inline_template("<%= `php -r 'echo PHP_MAJOR_VERSION.\".\".PHP_MINOR_VERSION;' 2>/dev/null`.strip %>")
+  $php_version = undef
+  ##inline_template("<%= `php -r 'echo PHP_MAJOR_VERSION.\".\".PHP_MINOR_VERSION;' 2>/dev/null`.strip %>")
   $php_sock    = "/run/php/php${php_version}-fpm.sock"
 
   $puser = $distro ? {

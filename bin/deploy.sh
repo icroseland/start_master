@@ -31,7 +31,7 @@ done
 if [ -f /etc/redhat-release ]; then
 
     DIST_VER=`cat /etc/[A-Za-z]*[_-][rv]e[lr]* | grep -E "^NAME=" | grep -o -P '(?<=").*?(?=")'`
-    echo $DIST_VER
+
     case "$DIST_VER" in
         "CentOS Linux"|"CentOS Stream"|"AlmaLinux"|"Oracle Linux"|"Rocky Linux")
             SN='el'
@@ -62,14 +62,22 @@ if [ -f /etc/redhat-release ]; then
     echo 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
     echo "LSB eq $DIST_VER  $LSB"
     GET_FILE=`curl -k -s https://yum.voxpupuli.org/ | grep -oP '(?<=href=")[^"]+' | grep -v '^/' | grep openvox | grep "$SN-$LSB" | sort -r | head -n 1`
-    rpm -Uvh https://yum.voxpupuli.org/$GET_FILE
+    echo $GET_FILE
+    if ! rpm -q  https://yum.voxpupuli.org/$GET_FILE >/dev/null 2>&1; then
+	rpm -Uvh https://yum.voxpupuli.org/$GET_FILE
+    fi
+    
     echo "##############################################"
     ##rpm -Uvh  "https://yum.voxpupuli.org/$GET_FILE" &&
     #disable selinux as its an annoyance for a demo right now.
     ##/usr/sbin/setenforce 0
-        dnf -y install openvox-server
-
-        dnf -y install openvox-agent
+    if ! rpm -q openvox-server >/dev/null 2>&1; then
+	dnf -y install openvox-server
+    fi
+    if ! rpm -q openvox-agent >/dev/null 2>&1; then
+	dnf -y install openvox-agent
+    fi
+    
 
 elif [ -f /etc/debian_version ]; then
     DIST_VER=`cat /etc/os-release | grep -E "^NAME=" | grep -o -P '(?<=").*?(?=")'`
