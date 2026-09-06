@@ -139,5 +139,6 @@ grep -E '^\s*-\s*.*\.tar\.gz$' $YAML_FILE | sed -E 's/^[[:space:]]*-[[:space:]]*
 ##rm -f /tmp/eyaml.zip
 
 #/opt/puppetlabs/bin/puppet apply --modulepath=/tmp/modules -e "class { selinux: mode => 'permissive',}"
+/opt/puppetlabs/bin/puppet apply --modulepath=/tmp/modules -e "include start_master::nothing"
 /opt/puppetlabs/bin/puppet apply --modulepath=/tmp/modules -e "include start_master::setup_master"
 
