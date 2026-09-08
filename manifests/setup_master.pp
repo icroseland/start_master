@@ -9,7 +9,9 @@ class start_master::setup_master(
   $r10k_basedir            = '/etc/puppetlabs/code/environments/',
   $distro                  = $facts['os']['family'],
   $fqdn                    = $facts['networking']['fqdn'],
+  $php_version             = $facts['php_version'],
 ){
+
 
 
 #exec { 'detect_php_version':
@@ -18,7 +20,7 @@ class start_master::setup_master(
 #  path    => ['/bin','/usr/bin'],
 #}
 #$php_version = file('/etc/php_version')
-$php_version = inline_template("<%= `php -r 'echo PHP_MAJOR_VERSION.\".\".PHP_MINOR_VERSION;' 2>/dev/null`.strip %>")
+#$php_version = inline_template("<%= `php -r 'echo PHP_MAJOR_VERSION.\".\".PHP_MINOR_VERSION;' 2>/dev/null`.strip %>")
 
 class { 'php::globals':
     php_version => $php_version,
