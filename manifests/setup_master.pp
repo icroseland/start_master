@@ -22,10 +22,10 @@ class start_master::setup_master(
 #$php_version = file('/etc/php_version')
 #$php_version = inline_template("<%= `php -r 'echo PHP_MAJOR_VERSION.\".\".PHP_MINOR_VERSION;' 2>/dev/null`.strip %>")
 
-class { 'php::globals':
-    php_version => $php_version,
-    require     => Exec['detect_php_version'],
-  }
+#class { 'php::globals':
+#    php_version => $php_version,
+#    require     => Exec['detect_php_version'],
+# # }
 
   # ---- r10k config structure ----
   $r10k_configured = {
@@ -183,50 +183,50 @@ class { 'php::globals':
 
   $php_sock    = "/run/php/php${php_version}-fpm.sock"
 
-  class { 'nginx':
-    manage_repo => true,
-  }
+#  class { 'nginx':
+#    manage_repo => true,
+#  }
 
-  class { 'php':
-    ensure       => present,
-    manage_repos => false,
-    fpm          => true,
-    dev          => false,
-    composer     => false,
-    pear         => true,
-    phpunit      => false,
-    fpm_user     => $puser,
-    fpm_group    => $pgroup,
-  }
+#  class { 'php':
+#    ensure       => present,
+#    manage_repos => false,
+#    fpm          => true,
+#    dev          => false,
+#    composer     => false,
+#    pear         => true,
+#    phpunit      => false,
+#    fpm_user     => $puser,
+#    fpm_group    => $pgroup,
+#  }
 
-  php::fpm::pool { $fqdn:
-    ensure       => present,
-    user         => $puser,
-    group        => $pgroup,
-    listen_owner => $puser,
-    listen_group => $pgroup,
-    listen_mode  => '0660',
-    listen       => $php_sock,
-    require      => Class['php'],
-  }
+#  php::fpm::pool { $fqdn:
+#    ensure       => present,
+#    user         => $puser,
+#    group        => $pgroup,
+#    listen_owner => $puser,
+#    listen_group => $pgroup,
+#    listen_mode  => '0660',
+#    listen       => $php_sock,
+#    require      => Class['php'],
+#  }
 
-  nginx::resource::server { $fqdn:
-    ensure    => present,
-    www_root  => '/etc/puppetlabs/www',
-    autoindex => 'on',
-    require   => Class['nginx'],
-  }
+#  nginx::resource::server { $fqdn:
+#    ensure    => present,
+#    www_root  => '/etc/puppetlabs/www',
+#    autoindex => 'on',
+#   require   => Class['nginx'],
+#  }
 
-  nginx::resource::location { "${fqdn}_php":
-    ensure      => present,
-    server      => $fqdn,
-    location    => '~ \.php$',
-    www_root    => '/etc/puppetlabs/www',
-    index_files => ['index.php'],
-    fastcgi     => "unix:${php_sock}",
-    include     => ['fastcgi.conf'],
-    require     => Php::Fpm::Pool[$fqdn],
-  }
+#  nginx::resource::location { "${fqdn}_php":
+#    ensure      => present,
+#    server      => $fqdn,
+#    location    => '~ \.php$',
+#    www_root    => '/etc/puppetlabs/www',
+#    index_files => ['index.php'],
+#    fastcgi     => "unix:${php_sock}",
+#    include     => ['fastcgi.conf'],
+#    require     => Php::Fpm::Pool[$fqdn],
+#  }
 
   # ---- misc ----
   file { '/home/inventory_data':
