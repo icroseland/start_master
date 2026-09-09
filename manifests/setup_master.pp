@@ -80,6 +80,8 @@ class start_master::setup_master(
     server_external_nodes => '',
     environment           => $environment,
     autosign              => true,
+    server_package        => 'openvox-server',
+    package_name          => 'openvox-agent'
   }
 
   file { ['/etc/facter', '/etc/facter/facts.d']:
