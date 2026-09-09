@@ -81,8 +81,7 @@ class start_master::setup_master(
     environment           => $environment,
     autosign              => true,
     server_package        => 'openvox-server',
-    package_name          => 'openvox-agent'
-  }
+    }
 
   file { ['/etc/facter', '/etc/facter/facts.d']:
     ensure => directory,
