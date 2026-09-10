@@ -62,15 +62,21 @@ if [ -f /etc/redhat-release ]; then
     echo 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
     echo "LSB eq $DIST_VER  $LSB"
     GET_FILE=`curl -k -s https://yum.voxpupuli.org/ | grep -oP '(?<=href=")[^"]+' | grep -v '^/' | grep openvox | grep "$SN-$LSB" | sort -r | head -n 1`
+    PACKAGE_NAME="/etc/yum.repos.d/openvox$LSB-release.repo"
+    echo "------- $PACKAGE_NAME ---------------"
     echo $GET_FILE
-    if ! rpm -q  https://yum.voxpupuli.org/$GET_FILE >/dev/null 2>&1; then
+    if [ ! -f "$PACKAGE_NAME" ]; then
+	echo "Not installed  yet"
 	rpm -Uvh https://yum.voxpupuli.org/$GET_FILE
+    else
+	echo 'no action'
     fi
     
     echo "##############################################"
     ##rpm -Uvh  "https://yum.voxpupuli.org/$GET_FILE" &&
     #disable selinux as its an annoyance for a demo right now.
     ##/usr/sbin/setenforce 0
+    ## openvox9-release.repo
     if ! rpm -q openvox-server >/dev/null 2>&1; then
 	dnf -y install openvox-server
     fi
@@ -129,16 +135,16 @@ grep -E '^\s*-\s*.*\.tar\.gz$' $YAML_FILE | sed -E 's/^[[:space:]]*-[[:space:]]*
 
 
 # install r10k gem
-/opt/puppetlabs/puppet/bin/gem install r10k
+#/opt/puppetlabs/puppet/bin/gem install r10k
 
 # setup eyaml to work
-/opt/puppetlabs/bin/puppetserver gem install eyaml
-wget -O /tmp/eyaml.zip 'https://github.com/icroseland/demo_eyaml/archive/refs/heads/main.zip'
-unzip /tmp/eyaml.zip -d /etc/puppetlabs
-mv /etc/puppetlabs/demo_eyaml-main /etc/puppetlabs/eyaml
-rm -f /tmp/eyaml.zip
+#/opt/puppetlabs/bin/puppetserver gem install eyaml
+#wget -O /tmp/eyaml.zip 'https://github.com/icroseland/demo_eyaml/archive/refs/heads/main.zip'
+#unzip /tmp/eyaml.zip -d /etc/puppetlabs
+#mv /etc/puppetlabs/demo_eyaml-main /etc/puppetlabs/eyaml
+#rm -f /tmp/eyaml.zip
 
 #/opt/puppetlabs/bin/puppet apply --modulepath=/tmp/modules -e "class { selinux: mode => 'permissive',}"
 #/opt/puppetlabs/bin/puppet apply --modulepath=/tmp/modules -e "include start_master::nothing"
-/opt/puppetlabs/bin/puppet apply --modulepath=/tmp/modules -e "include start_master::setup_master"
+#/opt/puppetlabs/bin/puppet apply --modulepath=/tmp/modules -e "include start_master::setup_master"
 
